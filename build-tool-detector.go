@@ -3,6 +3,7 @@ package main
 import (
 	"build-tool-detector/app"
 	"github.com/goadesign/goa"
+	"net/http"
 )
 
 // BuildToolDetectorController implements the build-tool-detector resource
@@ -17,11 +18,15 @@ func NewBuildToolDetectorController(service *goa.Service) *BuildToolDetectorCont
 
 // Show runs the show action.
 func (c *BuildToolDetectorController) Show(ctx *app.ShowBuildToolDetectorContext) error {
-	// BuildToolDetectorController_Show: start_implement
+	generatedURL := ctx.URL + "/blob/" + ctx.Branch + "/pom.xml"
 
-	// Put your logic here
+	response, err := http.Get(generatedURL)
+	if err != nil || response.StatusCode != 200 {
+		return ctx.NotFound()
+	}
 
-	res := &app.GoaBuildToolDetector{}
-	return ctx.OK(res)
-	// BuildToolDetectorController_Show: end_implement
+	buildTool := app.GoaBuildToolDetector{
+		Tool: "Maven",
+	}
+	return ctx.OK(&buildTool)
 }

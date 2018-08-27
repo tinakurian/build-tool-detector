@@ -6,6 +6,12 @@ import (
 )
 
 var _ = a.API("build-tool-detector", func() {
+	a.Origin("*", func() {
+		a.Methods("GET", "POST", "PUT", "PATCH", "DELETE")
+		a.Headers("Accept", "Content-Type")
+		a.Expose("Content-Type", "Origin")
+		a.Credentials()
+	})
 	a.Title("Detects the build tool for a specific repository and branch")
 	a.Description("A simple goa service")
 	a.Scheme("http")
@@ -18,7 +24,6 @@ var _ = a.API("build-tool-detector", func() {
 var _ = a.Resource("build-tool-detector", func() {
 	a.BasePath("/build-tool")
 	a.DefaultMedia(BuildToolDetectorMedia)
-
 	a.Action("show", func() {
 		a.Description("Get build tool")
 		a.Routing(
@@ -37,13 +42,11 @@ var _ = a.Resource("build-tool-detector", func() {
 var BuildToolDetectorMedia = a.MediaType("application/vnd.goa.build.tool.detector+json", func() {
 	a.Description("Detect the build tool for the specified repository and branch")
 	a.Attributes(func() {
-		a.Attribute("href", d.String, "API href for making requests on the build tool detection")
 		a.Attribute("tool", d.String, "Name of build tool")
-		a.Required("tool", "href")
+		a.Required("tool")
 	})
 	a.View("default", func() {
 		a.Attribute("tool")
-		a.Attribute("href")
 	})
 })
 
