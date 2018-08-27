@@ -34,7 +34,7 @@ var _ = a.Resource("build-tool-detector", func() {
 			a.Param("branch", d.String, "branch name")
 		})
 		a.Response(d.OK)
-		a.Response(d.NotFound)
+		a.Response(d.InternalServerError)
 	})
 })
 
@@ -42,11 +42,11 @@ var _ = a.Resource("build-tool-detector", func() {
 var BuildToolDetectorMedia = a.MediaType("application/vnd.goa.build.tool.detector+json", func() {
 	a.Description("Detect the build tool for the specified repository and branch")
 	a.Attributes(func() {
-		a.Attribute("tool", d.String, "Name of build tool")
-		a.Required("tool")
+		a.Attribute("build-tool-type", d.String, "Name of build tool")
+		a.Required("build-tool-type")
 	})
 	a.View("default", func() {
-		a.Attribute("tool")
+		a.Attribute("build-tool-type")
 	})
 })
 
