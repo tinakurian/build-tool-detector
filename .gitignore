@@ -37,9 +37,11 @@ _testmain.go
 # dep package manager
 vendor/
 
-# Generated assets
+# Generated folders
 app/
 client/
 swagger/
 tool/cli/
 public/
+
+# Binary Files

@@ -39,7 +39,7 @@ generate:
 	
 
 build:
-	@go build -o build-tool-detector
+	@go build -o app/build-tool-detector
 
 deploy: 
-	./build-tool-detector
+	./app/build-tool-detector
