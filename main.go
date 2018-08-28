@@ -4,6 +4,7 @@ package main
 
 import (
 	"build-tool-detector/app"
+	controllers "build-tool-detector/controllers"
 	"github.com/goadesign/goa"
 	"github.com/goadesign/goa/middleware"
 )
@@ -19,10 +20,10 @@ func main() {
 	service.Use(middleware.Recover())
 
 	// Mount "build-tool-detector" controller
-	c := NewBuildToolDetectorController(service)
+	c := controllers.NewBuildToolDetectorController(service)
 	app.MountBuildToolDetectorController(service, c)
 
-	cs := NewSwaggerController(service)
+	cs := controllers.NewSwaggerController(service)
 	app.MountSwaggerController(service, cs)
 
 	// Start service
