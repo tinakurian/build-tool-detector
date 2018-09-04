@@ -35,6 +35,7 @@ required = [
     "github.com/goadesign/goa/goagen/gen_client",
     "github.com/goadesign/goa/goagen/utils",
     "github.com/goadesign/goa/goatest",
+    "github.com/google/go-github/github",
 ]
 
 [[constraint]]

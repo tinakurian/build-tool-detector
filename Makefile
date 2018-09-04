@@ -19,7 +19,7 @@ all: depend clean generate build deploy
 
 depend:
 	# dep init
-	dep ensure
+	dep ensure -v
 
 clean:
 	@rm -rf app
@@ -31,7 +31,7 @@ clean:
 	@rm -f build-tool-detector
 
 generate:
-	@goagen bootstrap 	-d build-tool-detector/design
+	@goagen bootstrap 	-d build-tool-detector/design -o
 	@goagen app     	-d build-tool-detector/design
 	@goagen swagger 	-d build-tool-detector/design -o public
 	@goagen schema  	-d build-tool-detector/design -o public
