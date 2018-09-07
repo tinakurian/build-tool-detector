@@ -31,7 +31,7 @@ clean:
 	@rm -f build-tool-detector
 
 generate:
-	@goagen bootstrap 	-d build-tool-detector/design -o
+	@goagen controller	-d build-tool-detector/design -o controllers
 	@goagen app     	-d build-tool-detector/design
 	@goagen swagger 	-d build-tool-detector/design -o public
 	@goagen schema  	-d build-tool-detector/design -o public
