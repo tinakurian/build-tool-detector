@@ -2,10 +2,9 @@ package controllers
 
 import (
 	"build-tool-detector/app"
-	"encoding/json"
-	"fmt"
+	"build-tool-detector/controllers/github"
+	"build-tool-detector/controllers/parse"
 	"github.com/goadesign/goa"
-	"github.com/google/go-github/github"
 	"net/http"
 )
 
@@ -22,30 +21,23 @@ func NewBuildToolDetectorController(service *goa.Service) *BuildToolDetectorCont
 // Show runs the show action.
 func (c *BuildToolDetectorController) Show(ctx *app.ShowBuildToolDetectorContext) error {
 
-	client := github.NewClient(nil)
-	_, _, resp, err := client.Repositories.GetContents(ctx, ctx.Owner, ctx.Repository, "pom.xml", &github.RepositoryContentGetOptions{Ref: ctx.Branch})
+	gitType, url := parse.GitType(ctx.URL)
+	switch gitType {
+	case parse.GITHUB:
+		return handleGitHub(ctx, url)
+	case parse.UNKNOWN:
+		return ctx.InternalServerError()
+	default:
+		return ctx.InternalServerError()
+	}
+}
 
-	// If there was an error or the status code returned
-	// was not 200, return interal server error
-	if err != nil || resp.StatusCode != http.StatusOK {
+func handleGitHub(ctx *app.ShowBuildToolDetectorContext, url []string) error {
+	statusCode, buildTool := github.GetGithubBuildTool(ctx, url)
 
-		ctx.ResponseWriter.Header().Set("Content-Type", "application/json")
-		ctx.WriteHeader(http.StatusInternalServerError)
-		buildTool := app.GoaBuildToolDetector{
-			BuildToolType: "Unknown",
-		}
-		out, err := json.Marshal(buildTool)
-		if err != nil {
-			panic(err)
-		}
-		fmt.Fprint(ctx.ResponseWriter, string(out))
+	if statusCode == http.StatusInternalServerError {
 		return ctx.InternalServerError()
 	}
 
-	// If the response code was 200, return
-	// the detected build tool type as Maven
-	buildTool := app.GoaBuildToolDetector{
-		BuildToolType: "Maven",
-	}
 	return ctx.OK(&buildTool)
 }

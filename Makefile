@@ -33,7 +33,7 @@ clean:
 generate:
 	@goagen controller	-d build-tool-detector/design -o controllers
 	@goagen app     	-d build-tool-detector/design
-	@goagen swagger 	-d build-tool-detector/design -o public
+	@goagen swagger 	-d build-tool-detector/design
 	@goagen schema  	-d build-tool-detector/design -o public
 	@goagen client  	-d build-tool-detector/design
 	
