@@ -11,7 +11,7 @@ const sMASTER = "master"
 const sTREE = "tree"
 
 // GetAttributes something
-func GetAttributes(segments []string, ctxBranch string) Attributes {
+func GetAttributes(segments []string, ctxBranch *string) Attributes {
 
 	// Default branch that will be used is master
 	branch := sMASTER
@@ -28,8 +28,8 @@ func GetAttributes(segments []string, ctxBranch string) Attributes {
 	// branch through the URL or through the
 	// API parameter 'branch' then default
 	// to using master
-	if ctxBranch != "" {
-		branch = ctxBranch
+	if ctxBranch != nil {
+		branch = *ctxBranch
 	} else if len(segments) > 3 {
 		if segments[3] == sTREE {
 			branch = segments[4]

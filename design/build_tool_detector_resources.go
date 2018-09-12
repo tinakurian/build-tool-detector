@@ -13,12 +13,11 @@ var _ = a.Resource("build-tool-detector", func() {
 	a.Action("show", func() {
 		a.Description("Get build tool")
 		a.Routing(
-			a.GET("/:url/:branch"),
+			a.GET("/:url"),
 		)
 		a.Params(func() {
 			a.Param("url", d.String, "github url")
 			a.Param("branch", d.String, "github branch")
-			a.Required("url")
 		})
 		a.Response(d.OK)
 		a.Response(d.InternalServerError)
