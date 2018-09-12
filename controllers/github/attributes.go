@@ -1,8 +1,5 @@
 package github
 
-import "github.com/davecgh/go-spew/spew"
-import "fmt"
-
 // Attributes something
 type Attributes struct {
 	Owner      string
@@ -39,7 +36,5 @@ func GetAttributes(segments []string, ctxBranch string) Attributes {
 		}
 	}
 
-	spew.Dump(segments)
-	fmt.Printf("\n\n\n TINAAAAAAAAAAAAAA \n\n\n %s", "tina")
 	return Attributes{Owner: segments[1], Repository: segments[2], Branch: branch}
 }
