@@ -11,6 +11,7 @@ import (
 const (
 	GITHUB  = "github"
 	UNKNOWN = ""
+	DOTCOM  = ".com"
 )
 
 // URL (urlToParse)
@@ -29,7 +30,7 @@ func GitType(urlToParse string) (string, []string) {
 	}
 
 	segments := urlSegments(u)
-	if u.Host == "github.com" {
+	if u.Host == GITHUB+DOTCOM {
 		return GITHUB, segments
 	}
 
