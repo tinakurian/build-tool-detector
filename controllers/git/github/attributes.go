@@ -9,7 +9,8 @@ build using maven.
 */
 package github
 
-// Attributes something
+// Attributes used for retrieving
+// data using the go-github library.
 type Attributes struct {
 	Owner      string
 	Repository string

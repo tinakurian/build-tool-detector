@@ -15,7 +15,9 @@ import (
 	"net/http"
 )
 
-// GetGithubRepositoryPom something
+// GetGithubRepositoryPom requests the pom.xl
+// file to determine whether the project is
+// built using maven.
 func getGithubRepositoryPom(ctx *app.ShowBuildToolDetectorContext, attributes Attributes) int {
 	client := github.NewClient(nil)
 
