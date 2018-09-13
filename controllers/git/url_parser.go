@@ -18,12 +18,12 @@ import (
 )
 
 // constants to define the different
-// supported git services
+// supported git services.
 const (
-	// GITHUB service
+	// GITHUB service.
 	GITHUB = "github"
 
-	// UNKNOWN service
+	// UNKNOWN service.
 	UNKNOWN = "unknown"
 )
 
