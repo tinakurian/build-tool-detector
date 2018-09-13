@@ -2,8 +2,11 @@ package controllers
 
 import (
 	"build-tool-detector/app"
-	"build-tool-detector/controllers/github"
-	"build-tool-detector/controllers/parse"
+	"build-tool-detector/controllers/git"
+	"build-tool-detector/controllers/git/buildtype"
+	"build-tool-detector/controllers/git/github"
+	"encoding/json"
+	"fmt"
 	"github.com/goadesign/goa"
 	"net/http"
 )
@@ -20,24 +23,39 @@ func NewBuildToolDetectorController(service *goa.Service) *BuildToolDetectorCont
 
 // Show runs the show action.
 func (c *BuildToolDetectorController) Show(ctx *app.ShowBuildToolDetectorContext) error {
-
-	gitType, url := parse.GitType(ctx.URL)
+	gitType, url := git.GetType(ctx.URL)
 	switch gitType {
-	case parse.GITHUB:
+	case git.GITHUB:
 		return handleGitHub(ctx, url)
-	case parse.UNKNOWN:
-		return ctx.InternalServerError()
+	case git.UNKNOWN:
+		var buildTool app.GoaBuildToolDetector
+		return handleUnknown(ctx, buildTool)
 	default:
-		return ctx.InternalServerError()
+		var buildTool app.GoaBuildToolDetector
+		return handleUnknown(ctx, buildTool)
 	}
 }
 
 func handleGitHub(ctx *app.ShowBuildToolDetectorContext, url []string) error {
-	statusCode, buildTool := github.GetGithubBuildTool(ctx, url)
-
+	statusCode, buildTool := github.DetectBuildTool(ctx, url)
 	if statusCode == http.StatusInternalServerError {
-		return ctx.InternalServerError()
+		return handleUnknown(ctx, buildTool)
 	}
 
 	return ctx.OK(&buildTool)
+}
+
+func handleUnknown(ctx *app.ShowBuildToolDetectorContext, buildTool app.GoaBuildToolDetector) error {
+	if buildTool.BuildToolType == "" {
+		buildTool = buildtype.Unknown()
+	}
+
+	ctx.ResponseWriter.Header().Set("Content-Type", "application/json")
+	ctx.WriteHeader(http.StatusInternalServerError)
+	jsonBuildTool, err := json.Marshal(buildTool)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Fprint(ctx.ResponseWriter, string(jsonBuildTool))
+	return ctx.InternalServerError()
 }

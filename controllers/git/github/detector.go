@@ -2,23 +2,21 @@ package github
 
 import (
 	"build-tool-detector/app"
+	"build-tool-detector/controllers/git/buildtype"
 	"net/http"
 )
 
-// GetGithubBuildTool (githubURL string)
-func GetGithubBuildTool(ctx *app.ShowBuildToolDetectorContext, githubURL []string) (int, app.GoaBuildToolDetector) {
-
+// DetectBuildTool (githubURL string)
+func DetectBuildTool(ctx *app.ShowBuildToolDetectorContext, githubURL []string) (int, app.GoaBuildToolDetector) {
 	attributes := GetAttributes(githubURL, ctx.Branch)
 	httpStatusCode := getGithubRepositoryPom(ctx, attributes)
 
-	buildTool := app.GoaBuildToolDetector{
-		BuildToolType: "Unknown",
-	}
+	buildTool := buildtype.Unknown()
 
 	if httpStatusCode == http.StatusInternalServerError {
 		return http.StatusInternalServerError, buildTool
 	}
 
-	buildTool.BuildToolType = "Maven"
+	buildTool.BuildToolType = buildtype.MAVEN
 	return http.StatusOK, buildTool
 }
