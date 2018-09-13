@@ -1,14 +1,13 @@
 #! /usr/bin/make
 #
-# Makefile for goa cellar example
+# Makefile for build-tool-detector
 #
 # Targets:
+# - depend	  installs the project's dependencies
 # - clean     delete all generated files
-# - generate  (re)generate all goagen-generated files.
+# - generate  (re)generate all goagen-generated files
 # - build     compile executable
-# - ae-build  build appengine
-# - ae-dev    deploy to local (dev) appengine
-# - ae-deploy deploy to appengine
+# - deploy 	  deploy to localhost:8080
 #
 # Meta targets:
 # - all is the default target, it runs all the targets in the order above.

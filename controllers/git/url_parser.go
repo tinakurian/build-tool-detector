@@ -1,3 +1,14 @@
+/*
+
+Package git handles detecting build tool types
+for git services such as github, bitbucket
+and gitlab.
+
+Currently the build-tool-detector only
+supports github and can only recognize
+maven.
+
+*/
 package git
 
 import (
@@ -21,7 +32,12 @@ const (
 	sSLASH  = "/"
 )
 
-// GetType something
+// GetType performs a simple url parse and split
+// in order to retrieve the owner, repository
+// and potentially the branch.
+//
+// Note: This method will likely need to be enhanced
+// to handle different github url formats.
 func GetType(urlToParse string) (string, []string) {
 	u, err := url.Parse(urlToParse)
 	if err != nil {

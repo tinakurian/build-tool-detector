@@ -1,3 +1,12 @@
+/*
+
+Package github implements a way to extract
+and construct a request to github in order
+to retrieve a pom file. If the pom file is
+not present, we assume the project is not
+build using maven.
+
+*/
 package github
 
 import (
