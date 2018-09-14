@@ -7,15 +7,16 @@ and containing scaffold outputs.
 package controllers_test
 
 import (
+	"net/http"
+
+	"github.com/goadesign/goa"
+	. "github.com/onsi/ginkgo"
+	"github.com/onsi/gomega"
 	"github.com/tinakurian/build-tool-detector/app/test"
 	controllers "github.com/tinakurian/build-tool-detector/controllers"
 	git "github.com/tinakurian/build-tool-detector/controllers/git"
 	"github.com/tinakurian/build-tool-detector/controllers/git/buildtype"
 	"github.com/tinakurian/build-tool-detector/controllers/git/github"
-	"github.com/goadesign/goa"
-	. "github.com/onsi/ginkgo"
-	"github.com/onsi/gomega"
-	"net/http"
 )
 
 var _ = Describe("BuildToolDetector", func() {

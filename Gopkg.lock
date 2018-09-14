@@ -2,30 +2,39 @@
 
 
 [[projects]]
+  digest = "1:2aff5edb9bccd2974090fddb17ca7ab05a3f5c983db567c30c7f0b53404f5783"
   name = "github.com/ajg/form"
   packages = ["."]
+  pruneopts = "UT"
   revision = "cc2954064ec9ea8d93917f0f87456e11d7b881ad"
   version = "v1.5"
 
 [[projects]]
   branch = "master"
+  digest = "1:ef5b0622d834c139454148b8fd0c92bb314828900532b267ae62da9fec109866"
   name = "github.com/armon/go-metrics"
   packages = ["."]
+  pruneopts = "UT"
   revision = "3c58d8115a78a6879e5df75ae900846768d36895"
 
 [[projects]]
   branch = "master"
+  digest = "1:376e5a9fdb57657725ff19b4c510c3f5e1f804ab4ab0ff3064d8f4dc01e40fe2"
   name = "github.com/dimfeld/httppath"
   packages = ["."]
+  pruneopts = "UT"
   revision = "ee938bf735983d53694d79138ad9820efff94c92"
 
 [[projects]]
+  digest = "1:8d983343581370768675191a8695f52d663f50a9234c571128f3d146314892cf"
   name = "github.com/dimfeld/httptreemux"
   packages = ["."]
+  pruneopts = "UT"
   revision = "7f532489e7739b3d49df5c602bf63549881fe753"
   version = "v5.0.1"
 
 [[projects]]
+  digest = "1:5314bb294da6ada969d3804cbc2539353b2c30a7cda104ca3ab1ea24fb876f8f"
   name = "github.com/goadesign/goa"
   packages = [
     ".",
@@ -48,60 +57,76 @@
     "goatest",
     "middleware",
     "uuid",
-    "version"
+    "version",
   ]
+  pruneopts = "UT"
   revision = "e01bb31dd9403fa9d40747e1f93345bc96ea675e"
   version = "v1.4.0"
 
 [[projects]]
+  digest = "1:70088cd4a61c745fd77686978c41d868a85e12bb85d83692b4c15512f493c2ca"
   name = "github.com/google/go-github"
   packages = ["github"]
-  revision = "08dbadce1a0514f79ea9a9aa91b2f12ba656d5a7"
-  version = "v18.0.0"
+  pruneopts = "UT"
+  revision = "c3e9de61cf0678e682ea2b98cf1301ae3a814bc8"
+  version = "v18.1.0"
 
 [[projects]]
   branch = "master"
+  digest = "1:a63cff6b5d8b95638bfe300385d93b2a6d9d687734b863da8e09dc834510a690"
   name = "github.com/google/go-querystring"
   packages = ["query"]
+  pruneopts = "UT"
   revision = "53e6ce116135b80d037921a7fdd5138cf32d7a8a"
 
 [[projects]]
-  branch = "master"
+  digest = "1:2be5a35f0c5b35162c41bb24971e5dcf6ce825403296ee435429cdcc4e1e847e"
   name = "github.com/hashicorp/go-immutable-radix"
   packages = ["."]
-  revision = "7f3cd4390caab3250a57f30efdb2a65dd7649ecf"
+  pruneopts = "UT"
+  revision = "27df80928bb34bb1b0d6d0e01b9e679902e7a6b5"
+  version = "v1.0.0"
 
 [[projects]]
-  branch = "master"
+  digest = "1:67474f760e9ac3799f740db2c489e6423a4cde45520673ec123ac831ad849cb8"
   name = "github.com/hashicorp/golang-lru"
   packages = ["simplelru"]
-  revision = "0fb14efe8c47ae851c0034ed7a448854d3d34cf3"
+  pruneopts = "UT"
+  revision = "20f1fb78b0740ba8c3cb143a61e86ba5c8669768"
+  version = "v0.5.0"
 
 [[projects]]
+  digest = "1:a1038ef593beb4771c8f0f9c26e8b00410acd800af5c6864651d9bf160ea1813"
   name = "github.com/hpcloud/tail"
   packages = [
     ".",
     "ratelimiter",
     "util",
     "watch",
-    "winfile"
+    "winfile",
   ]
+  pruneopts = "UT"
   revision = "a30252cb686a21eb2d0b98132633053ec2f7f1e5"
   version = "v1.0.0"
 
 [[projects]]
+  digest = "1:870d441fe217b8e689d7949fef6e43efbc787e50f200cb1e70dbca9204a1d6be"
   name = "github.com/inconshreveable/mousetrap"
   packages = ["."]
+  pruneopts = "UT"
   revision = "76626ae9c91c4f2a10f34cad8ce83ea42c93bb75"
   version = "v1.0"
 
 [[projects]]
   branch = "master"
+  digest = "1:393f23e872c9141dbe315c428dc3eac9406f029be7ab0e1cae2374486c07aa54"
   name = "github.com/manveru/faker"
   packages = ["."]
+  pruneopts = "UT"
   revision = "9fbc68a78c4dbc7914e1a23f88f126bea4383b97"
 
 [[projects]]
+  digest = "1:42e29deef12327a69123b9cb2cb45fee4af5c12c2a23c6e477338279a052703f"
   name = "github.com/onsi/ginkgo"
   packages = [
     ".",
@@ -121,12 +146,14 @@
     "reporters/stenographer",
     "reporters/stenographer/support/go-colorable",
     "reporters/stenographer/support/go-isatty",
-    "types"
+    "types",
   ]
+  pruneopts = "UT"
   revision = "3774a09d95489ccaa16032e0770d08ea77ba6184"
   version = "v1.6.0"
 
 [[projects]]
+  digest = "1:ab54eea8d482272009e9e4af07d4d9b5236c27b4d8c54a3f2c99d163be883eca"
   name = "github.com/onsi/gomega"
   packages = [
     ".",
@@ -140,52 +167,66 @@
     "matchers/support/goraph/edge",
     "matchers/support/goraph/node",
     "matchers/support/goraph/util",
-    "types"
+    "types",
   ]
-  revision = "b6ea1ea48f981d0f615a154a45eabb9dd466556d"
-  version = "v1.4.1"
+  pruneopts = "UT"
+  revision = "7615b9433f86a8bdf29709bf288bc4fd0636a369"
+  version = "v1.4.2"
 
 [[projects]]
+  digest = "1:ff6b0586c0621a76832cf783eee58cbb9d9795d2ce8acbc199a4131db11c42a9"
   name = "github.com/satori/go.uuid"
   packages = ["."]
+  pruneopts = "UT"
   revision = "master"
 
 [[projects]]
+  digest = "1:645cabccbb4fa8aab25a956cbcbdf6a6845ca736b2c64e197ca7cbb9d210b939"
   name = "github.com/spf13/cobra"
   packages = ["."]
+  pruneopts = "UT"
   revision = "ef82de70bb3f60c65fb8eebacbb2d122ef517385"
   version = "v0.0.3"
 
 [[projects]]
+  digest = "1:dab83a1bbc7ad3d7a6ba1a1cc1760f25ac38cdf7d96a5cdd55cd915a4f5ceaf9"
   name = "github.com/spf13/pflag"
   packages = ["."]
+  pruneopts = "UT"
   revision = "9a97c102cda95a86cec2345a6f09f55a939babf5"
   version = "v1.0.2"
 
 [[projects]]
   branch = "master"
+  digest = "1:6f7f5a5452e6dc8b0665b0fd2b779c3c6b7e70a121e0661aeb03daef7baae58d"
   name = "github.com/zach-klippenstein/goregen"
   packages = ["."]
+  pruneopts = "UT"
   revision = "795b5e3961ea1912fde60af417ad85e86acc0d6a"
 
 [[projects]]
   branch = "master"
+  digest = "1:e8120270b9a10b4f0722f208268328809968edae68912f3d8f66c205288f5736"
   name = "golang.org/x/net"
   packages = [
     "html",
     "html/atom",
     "html/charset",
-    "websocket"
+    "websocket",
   ]
-  revision = "922f4815f713f213882e8ef45e0d315b164d705c"
+  pruneopts = "UT"
+  revision = "26e67e76b6c3f6ce91f7c52def5af501b4e0f3a2"
 
 [[projects]]
   branch = "master"
+  digest = "1:6eb2645d74b43d9c87b51947df39f7c668a4f422cd512053f7f6f75bfaad0197"
   name = "golang.org/x/sys"
   packages = ["unix"]
+  pruneopts = "UT"
   revision = "d0be0721c37eeb5299f245a996a483160fc36940"
 
 [[projects]]
+  digest = "1:aa4d6967a3237f8367b6bf91503964a77183ecf696f1273e8ad3551bb4412b5f"
   name = "golang.org/x/text"
   packages = [
     "encoding",
@@ -204,39 +245,66 @@
     "language",
     "runes",
     "transform",
-    "unicode/cldr"
+    "unicode/cldr",
   ]
+  pruneopts = "UT"
   revision = "f21a4dfb5e38f5895301dc265a8def02365cc3d0"
   version = "v0.3.0"
 
 [[projects]]
   branch = "master"
+  digest = "1:b179fdebc34548df954150205325afd573927b02ed417ce34fea73d519315718"
   name = "golang.org/x/tools"
   packages = ["go/ast/astutil"]
-  revision = "0bd7993ac0faaa363ea801cf51c8a3c140ea586b"
+  pruneopts = "UT"
+  revision = "677d2ff680c188ddb7dcd2bfa6bc7d3f2f2f75b2"
 
 [[projects]]
+  digest = "1:abeb38ade3f32a92943e5be54f55ed6d6e3b6602761d74b4aab4c9dd45c18abd"
   name = "gopkg.in/fsnotify.v1"
   packages = ["."]
+  pruneopts = "UT"
   revision = "c2828203cd70a50dcccfb2761f8b1f8ceef9a8e9"
   source = "https://github.com/fsnotify/fsnotify.git"
   version = "v1.4.7"
 
 [[projects]]
   branch = "v1"
+  digest = "1:0caa92e17bc0b65a98c63e5bc76a9e844cd5e56493f8fdbb28fad101a16254d9"
   name = "gopkg.in/tomb.v1"
   packages = ["."]
+  pruneopts = "UT"
   revision = "dd632973f1e7218eb1089048e0798ec9ae7dceb8"
 
 [[projects]]
+  digest = "1:342378ac4dcb378a5448dd723f0784ae519383532f5e70ade24132c4c8693202"
   name = "gopkg.in/yaml.v2"
   packages = ["."]
+  pruneopts = "UT"
   revision = "5420a8b6744d3b0345ab293f6fcba19c978f1183"
   version = "v2.2.1"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "d00c042550da7ee39b135d65f1f6957f68a064aea04a41287e2a78e13e98d656"
+  input-imports = [
+    "github.com/goadesign/goa",
+    "github.com/goadesign/goa/cors",
+    "github.com/goadesign/goa/design",
+    "github.com/goadesign/goa/design/apidsl",
+    "github.com/goadesign/goa/encoding/form",
+    "github.com/goadesign/goa/goagen",
+    "github.com/goadesign/goa/goagen/codegen",
+    "github.com/goadesign/goa/goagen/gen_app",
+    "github.com/goadesign/goa/goagen/gen_client",
+    "github.com/goadesign/goa/goagen/gen_controller",
+    "github.com/goadesign/goa/goagen/gen_swagger",
+    "github.com/goadesign/goa/goagen/utils",
+    "github.com/goadesign/goa/goatest",
+    "github.com/goadesign/goa/middleware",
+    "github.com/google/go-github/github",
+    "github.com/onsi/ginkgo",
+    "github.com/onsi/gomega",
+  ]
   solver-name = "gps-cdcl"
   solver-version = 1

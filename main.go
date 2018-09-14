@@ -3,10 +3,10 @@
 package main
 
 import (
-	"github.com/tinakurian/build-tool-detector/app"
-	controllers "github.com/tinakurian/build-tool-detector/controllers"
 	"github.com/goadesign/goa"
 	"github.com/goadesign/goa/middleware"
+	"github.com/tinakurian/build-tool-detector/app"
+	controllers "github.com/tinakurian/build-tool-detector/controllers"
 )
 
 func main() {
