@@ -40,7 +40,7 @@ type ServiceType struct {
 	Segments []string
 }
 
-// GetType performs a simple url parse and split
+// GetServiceType performs a simple url parse and split
 // in order to retrieve the owner, repository
 // and potentially the branch.
 //
