@@ -54,7 +54,9 @@ func handleRequest(ctx *app.ShowBuildToolDetectorContext, httpTypeError *errs.HT
 
 	if httpTypeError != nil {
 		ctx.WriteHeader(httpTypeError.StatusCode)
-		fmt.Fprint(ctx.ResponseWriter, string(marshalJSON(httpTypeError)))
+		if _, err := fmt.Fprint(ctx.ResponseWriter, string(marshalJSON(httpTypeError))); err != nil {
+			panic(err)
+		}
 	}
 
 	if httpTypeError == nil {

@@ -7,7 +7,7 @@ PROJECT_NAME := 'build-tool-detector'
 
 .DEFAULT_GOAL := all
 
-all: clean install generate build test run
+all: clean install generate build test check
 
 # Build configuration
 BUILD_TIME=$(shell date -u '+%Y-%m-%dT%H:%M:%SZ')
@@ -64,7 +64,7 @@ format:
 
 .PHONY: check
 check: ## Concurrently runs a whole bunch of static analysis tools
-	@gometalinter --enable=misspell --enable=gosimple --enable-gc --vendor --deadline 300s ./...
+	@gometalinter --enable=misspell --enable=gosimple --enable-gc --vendor --skip=app --skip=client --skip=tool --deadline 300s ./...
 
 .PHONY: run
 run: ## runs the service locally
