@@ -14,6 +14,9 @@
 #
 CURRENT_DIR := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 
+PROJECT_REPO := 'github.com/tinakurian'
+PROJECT_NAME := 'build-tool-detector'
+
 all: depend clean generate build deploy
 
 depend:
@@ -30,11 +33,11 @@ clean:
 	@rm -f build-tool-detector
 
 generate:
-	@goagen controller	-d build-tool-detector/design -o controllers
-	@goagen app     	-d build-tool-detector/design
-	@goagen swagger 	-d build-tool-detector/design
-	@goagen schema  	-d build-tool-detector/design -o public
-	@goagen client  	-d build-tool-detector/design
+	@goagen controller	-d $(PROJECT_REPO)/$(PROJECT_NAME)/design -o controllers
+	@goagen app     	-d $(PROJECT_REPO)/$(PROJECT_NAME)/design
+	@goagen swagger 	-d $(PROJECT_REPO)/$(PROJECT_NAME)/design
+	@goagen schema  	-d $(PROJECT_REPO)/$(PROJECT_NAME)/design -o public
+	@goagen client  	-d $(PROJECT_REPO)/$(PROJECT_NAME)/design
 	
 
 build:
