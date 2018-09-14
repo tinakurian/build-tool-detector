@@ -81,5 +81,5 @@ tools: ## Installs all necessary tools
 	@echo "Installing goimports"
 	@go get -u golang.org/x/tools/cmd/goimports
 
-	@echo "Installing goa${CLEAR}"
+	@echo "Installing goa"
 	@go get -u github.com/goadesign/goa/...

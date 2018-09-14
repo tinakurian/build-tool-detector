@@ -1,0 +1,33 @@
+= Build Tool Detector
+:test: gometaliner
+
+Little service which will detect what build tool you are using
+
+=== Start hacking [[hacking]]
+
+Use `setup.sh` script we ship in this repository to get started right away!
+
+Assuming that you have all the link:https://golang.org/doc/install[Golang prerequisites] in place (such as `$GOPATH`), clone the repository first.
+
+NOTE: Have a look how link:https://github.com/moovweb/gvm[Go Version Manager] can help you simplifying configuration and management of different versions of Go.
+
+Then run the build by simply executing `make` from the root directory. This will perform following actions:
+
+. Clean artifacts from the previous build
+. Fetch or update dependencies using `godep`
+. Compile and build binaries
+. Run tests
+. Run static code analysis
+
+When in doubt just `make help`.
+
+=== Continuous Testing [[testing]]
+
+In order to continuously run the tests whenever code change occur execute following command from the root directory of the project:
+
+[source,bash]
+----
+$ ginkgo watch -r
+----
+
+and keep it running in the terminal.
