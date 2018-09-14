@@ -12,7 +12,8 @@ maven.
 package git
 
 import (
-	"log"
+	errs "build-tool-detector/controllers/error"
+	"build-tool-detector/controllers/git/github"
 	"net/url"
 	"strings"
 )
@@ -32,22 +33,42 @@ const (
 	sSLASH  = "/"
 )
 
+// ServiceType contains the service
+// and path segments
+type ServiceType struct {
+	Service  string
+	Segments []string
+}
+
 // GetType performs a simple url parse and split
 // in order to retrieve the owner, repository
 // and potentially the branch.
 //
 // Note: This method will likely need to be enhanced
 // to handle different github url formats.
-func GetType(urlToParse string) (string, []string) {
+func GetServiceType(urlToParse string) (*errs.HTTPTypeError, ServiceType) {
 	u, err := url.Parse(urlToParse)
-	if err != nil {
-		log.Fatal(err)
+	var service ServiceType
+
+	// Fail on error or empty host or empty scheme
+	if err != nil || u.Host == "" || u.Scheme == "" {
+		return errs.ErrBadRequest(github.ErrBadRequest), service
 	}
 
 	segments := strings.Split(u.Path, sSLASH)
-	if u.Host == GITHUB+sDOTCOM {
-		return GITHUB, segments
+	if len(segments) < 2 {
+		return errs.ErrBadRequest(github.ErrBadRequest), service
 	}
 
-	return UNKNOWN, segments
+	// Only support github service today
+	service = ServiceType{
+		Service:  UNKNOWN,
+		Segments: segments,
+	}
+
+	if u.Host == GITHUB+sDOTCOM || len(segments) < 2 {
+		service.Service = GITHUB
+	}
+
+	return nil, service
 }

@@ -38,8 +38,8 @@ const (
 // Maven will create a buildToolDetector
 // struct with the BuildToolType set
 // to maven.
-func Maven() app.GoaBuildToolDetector {
-	return app.GoaBuildToolDetector{
+func Maven() *app.GoaBuildToolDetector {
+	return &app.GoaBuildToolDetector{
 		BuildToolType: MAVEN,
 	}
 }
@@ -47,8 +47,8 @@ func Maven() app.GoaBuildToolDetector {
 // Unknown will create a buildToolDetector
 // struct with the BuildToolType set
 // to unknown.
-func Unknown() app.GoaBuildToolDetector {
-	return app.GoaBuildToolDetector{
+func Unknown() *app.GoaBuildToolDetector {
+	return &app.GoaBuildToolDetector{
 		BuildToolType: UNKNOWN,
 	}
 }
