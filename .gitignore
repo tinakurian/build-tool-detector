@@ -44,8 +44,9 @@ swagger/
 tool/cli/
 public/
 
-# ginkgo 
+# ginkgo
 *.coverprofile
 
 # Binary Files
 
+bin/

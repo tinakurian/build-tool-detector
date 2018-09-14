@@ -10,11 +10,12 @@ build using maven.
 package github
 
 import (
+	"errors"
+	"net/http"
+
+	"github.com/google/go-github/github"
 	"github.com/tinakurian/build-tool-detector/app"
 	errs "github.com/tinakurian/build-tool-detector/controllers/error"
-	"errors"
-	"github.com/google/go-github/github"
-	"net/http"
 )
 
 var (
