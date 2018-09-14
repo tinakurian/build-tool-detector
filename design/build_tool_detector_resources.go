@@ -21,9 +21,7 @@ var _ = a.Resource("build-tool-detector", func() {
 		})
 		a.Response(d.OK)
 		a.Response(d.InternalServerError)
-		a.Response(d.BadRequest, func() {
-			a.MediaType()
-		})
+		a.Response(d.BadRequest)
 	})
 })
 
@@ -36,21 +34,5 @@ var BuildToolDetectorMedia = a.MediaType("application/vnd.goa.build.tool.detecto
 	})
 	a.View("default", func() {
 		a.Attribute("build-tool-type")
-	})
-})
-
-// BuildToolDetectorMedia defines the media type used to render the build tool
-var BadRequestMedia = a.MediaType("application/vnd.goa.build.tool.detector+json", func() {
-	a.Description("Bad request error message")
-	a.Attributes(func() {
-		a.Attribute("StatusCode", d.Integer, "HTTP status code")
-		a.Required("StatusCode")
-		a.Attribute("StatusMessage", d.Integer, "HTTP status message")
-		a.Required("StatusMessage")
-		a.Attribute("Error", d.Integer, "Error message")
-		a.Required("Error")
-	})
-	a.View("default", func() {
-		a.Attribute("StatusCode")
 	})
 })
