@@ -10,10 +10,9 @@ build using maven.
 package github
 
 import (
-  errs "github.com/tinakurian/build-tool-detector/controllers/error"
 	"github.com/tinakurian/build-tool-detector/app"
+	errs "github.com/tinakurian/build-tool-detector/controllers/error"
 	"github.com/tinakurian/build-tool-detector/controllers/git/buildtype"
-	"net/http"
 	"log"
 )
 

@@ -10,8 +10,8 @@ build using maven.
 package github
 
 import (
-	errs "build-tool-detector/controllers/error"
 	"errors"
+	errs "github.com/tinakurian/build-tool-detector/controllers/error"
 )
 
 // Attributes used for retrieving
