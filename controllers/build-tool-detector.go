@@ -10,6 +10,7 @@ package controllers
 
 import (
 	"build-tool-detector/app"
+	errs "build-tool-detector/controllers/error"
 	"build-tool-detector/controllers/git"
 	"build-tool-detector/controllers/git/buildtype"
 	"build-tool-detector/controllers/git/github"
@@ -31,39 +32,56 @@ func NewBuildToolDetectorController(service *goa.Service) *BuildToolDetectorCont
 
 // Show runs the show action.
 func (c *BuildToolDetectorController) Show(ctx *app.ShowBuildToolDetectorContext) error {
-	gitType, url := git.GetType(ctx.URL)
-	switch gitType {
-	case git.GITHUB:
-		return handleGitHub(ctx, url)
-	case git.UNKNOWN:
-		var buildTool app.GoaBuildToolDetector
-		return handleUnknown(ctx, buildTool)
-	default:
-		var buildTool app.GoaBuildToolDetector
-		return handleUnknown(ctx, buildTool)
+	err, gitService := git.GetServiceType(ctx.URL)
+	if err != nil {
+		return handleRequest(ctx, err, nil)
 	}
+
+	if gitService.Service != git.GITHUB {
+		return handleRequest(ctx, nil, buildtype.Unknown())
+	}
+
+	err, buildTool := github.DetectBuildTool(ctx, gitService.Segments)
+	if err != nil {
+		return handleRequest(ctx, err, nil)
+	}
+
+	return handleRequest(ctx, nil, buildTool)
 }
 
-func handleGitHub(ctx *app.ShowBuildToolDetectorContext, url []string) error {
-	statusCode, buildTool := github.DetectBuildTool(ctx, url)
-	if statusCode == http.StatusInternalServerError {
-		return handleUnknown(ctx, buildTool)
-	}
-
-	return ctx.OK(&buildTool)
-}
-
-func handleUnknown(ctx *app.ShowBuildToolDetectorContext, buildTool app.GoaBuildToolDetector) error {
-	if buildTool.BuildToolType == "" {
-		buildTool = buildtype.Unknown()
-	}
-
+func handleRequest(ctx *app.ShowBuildToolDetectorContext, httpTypeError *errs.HTTPTypeError, buildTool *app.GoaBuildToolDetector) error {
 	ctx.ResponseWriter.Header().Set("Content-Type", "application/json")
-	ctx.WriteHeader(http.StatusInternalServerError)
-	jsonBuildTool, err := json.Marshal(buildTool)
+
+	if httpTypeError != nil {
+		ctx.WriteHeader(httpTypeError.StatusCode)
+		fmt.Fprint(ctx.ResponseWriter, string(marshalJSON(httpTypeError)))
+	}
+
+	if httpTypeError == nil {
+		return ctx.OK(buildTool)
+	}
+
+	return getErrResponse(ctx, httpTypeError)
+}
+
+func marshalJSON(httpTypeError *errs.HTTPTypeError) []byte {
+
+	jsonHTTPTypeError, err := json.Marshal(httpTypeError)
 	if err != nil {
 		panic(err)
 	}
-	fmt.Fprint(ctx.ResponseWriter, string(jsonBuildTool))
-	return ctx.InternalServerError()
+
+	return jsonHTTPTypeError
+}
+
+func getErrResponse(ctx *app.ShowBuildToolDetectorContext, httpTypeError *errs.HTTPTypeError) error {
+	var response error
+	switch httpTypeError.StatusCode {
+	case http.StatusBadRequest:
+		response = ctx.BadRequest()
+	case http.StatusInternalServerError:
+		response = ctx.InternalServerError()
+	}
+
+	return response
 }

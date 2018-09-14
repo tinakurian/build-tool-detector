@@ -21,6 +21,7 @@ var _ = a.Resource("build-tool-detector", func() {
 		})
 		a.Response(d.OK)
 		a.Response(d.InternalServerError)
+		a.Response(d.BadRequest)
 	})
 })
 
