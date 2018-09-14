@@ -7,8 +7,8 @@ and containing scaffold outputs.
 package controllers_test
 
 import (
-	"build-tool-detector/app/test"
-	controllers "build-tool-detector/controllers"
+	"github.com/tinakurian/build-tool-detector/app/test"
+	controllers "github.com/tinakurian/build-tool-detector/controllers"
 	"github.com/goadesign/goa"
 	. "github.com/onsi/ginkgo"
 	"github.com/onsi/gomega"

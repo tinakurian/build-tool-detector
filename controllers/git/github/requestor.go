@@ -10,7 +10,7 @@ build using maven.
 package github
 
 import (
-	"build-tool-detector/app"
+	"github.com/tinakurian/build-tool-detector/app"
 	"github.com/google/go-github/github"
 	"net/http"
 )

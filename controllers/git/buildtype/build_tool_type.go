@@ -24,7 +24,7 @@ in the following JSON response:
 package buildtype
 
 import (
-	"build-tool-detector/app"
+	"github.com/tinakurian/build-tool-detector/app"
 )
 
 const (

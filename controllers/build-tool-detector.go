@@ -9,10 +9,10 @@ and files.
 package controllers
 
 import (
-	"build-tool-detector/app"
-	"build-tool-detector/controllers/git"
-	"build-tool-detector/controllers/git/buildtype"
-	"build-tool-detector/controllers/git/github"
+	"github.com/tinakurian/build-tool-detector/app"
+	"github.com/tinakurian/build-tool-detector/controllers/git"
+	"github.com/tinakurian/build-tool-detector/controllers/git/buildtype"
+	"github.com/tinakurian/build-tool-detector/controllers/git/github"
 	"encoding/json"
 	"fmt"
 	"github.com/goadesign/goa"

@@ -10,8 +10,8 @@ build using maven.
 package github
 
 import (
-	"build-tool-detector/app"
-	"build-tool-detector/controllers/git/buildtype"
+	"github.com/tinakurian/build-tool-detector/app"
+	"github.com/tinakurian/build-tool-detector/controllers/git/buildtype"
 	"net/http"
 )
 

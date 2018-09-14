@@ -1,11 +1,11 @@
 package main
 
 import (
-	"build-tool-detector/client"
-	"build-tool-detector/tool/cli"
 	"fmt"
 	goaclient "github.com/goadesign/goa/client"
 	"github.com/spf13/cobra"
+	"github.com/tinakurian/build-tool-detector/client"
+	"github.com/tinakurian/build-tool-detector/tool/cli"
 	"net/http"
 	"os"
 	"time"
