@@ -7,11 +7,11 @@ and containing scaffold outputs.
 package controllers_test
 
 import (
-	"build-tool-detector/app/test"
-	controllers "build-tool-detector/controllers"
-	git "build-tool-detector/controllers/git"
-	"build-tool-detector/controllers/git/buildtype"
-	"build-tool-detector/controllers/git/github"
+	"github.com/tinakurian/build-tool-detector/app/test"
+	controllers "github.com/tinakurian/build-tool-detector/controllers"
+	git "github.com/tinakurian/build-tool-detector/controllers/git"
+	"github.com/tinakurian/build-tool-detector/controllers/git/buildtype"
+	"github.com/tinakurian/build-tool-detector/controllers/git/github"
 	"github.com/goadesign/goa"
 	. "github.com/onsi/ginkgo"
 	"github.com/onsi/gomega"
