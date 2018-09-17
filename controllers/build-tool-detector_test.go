@@ -98,7 +98,7 @@ var _ = Describe("BuildToolDetector", func() {
 		})
 	})
 
-	Context("build-tool-detector/controllers/git/buildtype", func() {
+	Context("build-tool-detector/controllers/buildtype", func() {
 		It("build_tool_type - Maven()", func() {
 			buildToolType := buildtype.Maven()
 			gomega.Expect(buildToolType.BuildToolType).Should(gomega.BeEquivalentTo("maven"), "build type should be equivalent to 'maven'")
