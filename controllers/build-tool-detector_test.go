@@ -67,7 +67,7 @@ var _ = Describe("BuildToolDetector", func() {
 	})
 
 	Context("build-tool-detector/controllers/git", func() {
-		It("url_parser - GetServiceType() service github", func() {
+		It("git_service_type - GetServiceType() service github", func() {
 			_, gitService := git.GetServiceType("https://github.com/owner/repo/tree/branch")
 
 			gomega.Expect(gitService.Service).Should(gomega.BeEquivalentTo("github"), "git service should be equivalent to 'github'")
@@ -77,24 +77,24 @@ var _ = Describe("BuildToolDetector", func() {
 			gomega.Expect(gitService.Segments[4]).Should(gomega.BeEquivalentTo("branch"), "fourth segment from url should be 'branch'")
 		})
 
-		It("url_parser - GetServiceType() service unknown", func() {
+		It("git_service_type - GetServiceType() service unknown", func() {
 			_, gitService := git.GetServiceType("https://test.com/test/test/tree/master")
 			gomega.Expect(gitService.Service).Should(gomega.BeEquivalentTo("unknown"), "git service should be equivalent to 'unknown'")
 		})
 
-		It("url_parser - GetServiceType() bad request with no owner or repository", func() {
+		It("git_service_type - GetServiceType() bad request with no owner or repository", func() {
 			err, _ := git.GetServiceType("https://test.com")
-			gomega.Expect(err.StatusCode).Should(gomega.BeEquivalentTo(http.StatusBadRequest), "git service should be equivalent to 'unknown'")
+			gomega.Expect(err.StatusCode).Should(gomega.BeEquivalentTo(http.StatusBadRequest), "git service should be equivalent to 'http.StatusBadRequest'")
 		})
 
-		It("url_parser - GetServiceType() bad request with no schema or host", func() {
+		It("git_service_type - GetServiceType() bad request with no schema or host", func() {
 			err, _ := git.GetServiceType("test/test/test")
-			gomega.Expect(err.StatusCode).Should(gomega.BeEquivalentTo(http.StatusBadRequest), "git service should be equivalent to 'unknown'")
+			gomega.Expect(err.StatusCode).Should(gomega.BeEquivalentTo(http.StatusBadRequest), "git service should be equivalent to 'http.StatusBadRequest'")
 		})
 
-		It("url_parser - GetTyGetServiceTypepe() bad request whitespace url", func() {
+		It("git_service_type - GetTyGetServiceTypepe() bad request whitespace url", func() {
 			err, _ := git.GetServiceType(" ")
-			gomega.Expect(err.StatusCode).Should(gomega.BeEquivalentTo(http.StatusBadRequest), "git service should be equivalent to 'unknown'")
+			gomega.Expect(err.StatusCode).Should(gomega.BeEquivalentTo(http.StatusBadRequest), "git service should be equivalent to 'http.StatusBadRequest'")
 		})
 	})
 
