@@ -25,7 +25,7 @@ func DetectBuildTool(ctx *app.ShowBuildToolDetectorContext, githubURL []string) 
 
 	// GetAttributes returns a BadRequest error and
 	// will print the error to the user
-	httpTypeError, attributes := GetAttributes(githubURL, ctx.Branch)
+	httpTypeError, attributes := getAttributes(githubURL, ctx.Branch)
 	if httpTypeError != nil {
 		log.Printf("Error: %v", httpTypeError)
 		return httpTypeError, nil
