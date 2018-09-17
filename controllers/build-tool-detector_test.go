@@ -14,8 +14,8 @@ import (
 	"github.com/onsi/gomega"
 	"github.com/tinakurian/build-tool-detector/app/test"
 	controllers "github.com/tinakurian/build-tool-detector/controllers"
+	"github.com/tinakurian/build-tool-detector/controllers/buildtype"
 	git "github.com/tinakurian/build-tool-detector/controllers/git"
-	"github.com/tinakurian/build-tool-detector/controllers/git/buildtype"
 	"github.com/tinakurian/build-tool-detector/controllers/git/github"
 )
 

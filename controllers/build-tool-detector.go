@@ -15,9 +15,9 @@ import (
 
 	"github.com/goadesign/goa"
 	"github.com/tinakurian/build-tool-detector/app"
+	"github.com/tinakurian/build-tool-detector/controllers/buildtype"
 	errs "github.com/tinakurian/build-tool-detector/controllers/error"
 	"github.com/tinakurian/build-tool-detector/controllers/git"
-	"github.com/tinakurian/build-tool-detector/controllers/git/buildtype"
 	"github.com/tinakurian/build-tool-detector/controllers/git/github"
 )
 
