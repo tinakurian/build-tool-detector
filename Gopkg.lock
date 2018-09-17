@@ -289,6 +289,7 @@
   analyzer-version = 1
   input-imports = [
     "github.com/goadesign/goa",
+    "github.com/goadesign/goa/client",
     "github.com/goadesign/goa/cors",
     "github.com/goadesign/goa/design",
     "github.com/goadesign/goa/design/apidsl",
@@ -302,9 +303,11 @@
     "github.com/goadesign/goa/goagen/utils",
     "github.com/goadesign/goa/goatest",
     "github.com/goadesign/goa/middleware",
+    "github.com/goadesign/goa/uuid",
     "github.com/google/go-github/github",
     "github.com/onsi/ginkgo",
     "github.com/onsi/gomega",
+    "github.com/spf13/cobra",
   ]
   solver-name = "gps-cdcl"
   solver-version = 1
