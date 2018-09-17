@@ -11,6 +11,7 @@ package github
 
 import (
 	"errors"
+
 	errs "github.com/tinakurian/build-tool-detector/controllers/error"
 )
 
