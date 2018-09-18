@@ -6,8 +6,9 @@ import (
 	"github.com/tinakurian/build-tool-detector/controllers/git"
 )
 
-// GetService something
+// GetService Gets the appropriate service
+// for the context provided
 func GetService(ctx *app.ShowBuildToolDetectorContext) (*errs.HTTPTypeError, *app.GoaBuildToolDetector) {
-	// Only support Git
+	// Currently only support Git
 	return git.GetGitService(ctx)
 }

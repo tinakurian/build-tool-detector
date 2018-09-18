@@ -164,6 +164,12 @@
 
 [[projects]]
   branch = "master"
+  name = "github.com/toolkits/sys"
+  packages = ["."]
+  revision = "1f33b217ffafd62561fa8f5b4977dfe3099f47e3"
+
+[[projects]]
+  branch = "master"
   name = "github.com/zach-klippenstein/goregen"
   packages = ["."]
   revision = "795b5e3961ea1912fde60af417ad85e86acc0d6a"
@@ -237,28 +243,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  input-imports = [
-    "github.com/goadesign/goa",
-    "github.com/goadesign/goa/client",
-    "github.com/goadesign/goa/cors",
-    "github.com/goadesign/goa/design",
-    "github.com/goadesign/goa/design/apidsl",
-    "github.com/goadesign/goa/encoding/form",
-    "github.com/goadesign/goa/goagen",
-    "github.com/goadesign/goa/goagen/codegen",
-    "github.com/goadesign/goa/goagen/gen_app",
-    "github.com/goadesign/goa/goagen/gen_client",
-    "github.com/goadesign/goa/goagen/gen_controller",
-    "github.com/goadesign/goa/goagen/gen_swagger",
-    "github.com/goadesign/goa/goagen/utils",
-    "github.com/goadesign/goa/goatest",
-    "github.com/goadesign/goa/middleware",
-    "github.com/goadesign/goa/uuid",
-    "github.com/google/go-github/github",
-    "github.com/onsi/ginkgo",
-    "github.com/onsi/gomega",
-    "github.com/spf13/cobra",
-  ]
-  inputs-digest = "d00c042550da7ee39b135d65f1f6957f68a064aea04a41287e2a78e13e98d656"
+  inputs-digest = "2bba08c657ee5103d35d9ef6a0e62e9b051bb3b0e5c46f62d7af15a5d5bb090e"
   solver-name = "gps-cdcl"
   solver-version = 1

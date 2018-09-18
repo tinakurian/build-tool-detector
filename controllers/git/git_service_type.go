@@ -50,7 +50,7 @@ func GetGitService(ctx *app.ShowBuildToolDetectorContext) (*errs.HTTPTypeError, 
 		return err, nil
 	}
 
-	// If the type is Github pass here
+	// If the type is Github, get the build tool
 	err, buildTool := github.GetGithubService(ctx, service.Segments)
 	if err != nil {
 		return err, nil

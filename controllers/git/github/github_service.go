@@ -57,7 +57,7 @@ func GetGithubService(ctx *app.ShowBuildToolDetectorContext, githubURL []string)
 	httpTypeError = isMaven(ctx, attributes)
 	if httpTypeError != nil {
 		log.Printf("Error: %v", httpTypeError)
-		return httpTypeError, nil
+		return httpTypeError, buildTool
 	}
 
 	// Reset the buildToolType to maven since
