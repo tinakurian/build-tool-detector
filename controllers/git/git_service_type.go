@@ -34,9 +34,9 @@ const (
 	sSLASH  = "/"
 )
 
-// ServiceType contains the service
+// serviceType contains the service
 // and path segments
-type ServiceType struct {
+type serviceType struct {
 	Service  string
 	Segments []string
 }
@@ -64,9 +64,9 @@ func GetGitService(ctx *app.ShowBuildToolDetectorContext) (*errs.HTTPTypeError, 
 //
 // Note: This method will likely need to be enhanced
 // to handle different github url formats.
-func getServiceType(urlToParse string) (*errs.HTTPTypeError, ServiceType) {
+func getServiceType(urlToParse string) (*errs.HTTPTypeError, serviceType) {
 	u, err := url.Parse(urlToParse)
-	var service ServiceType
+	var service serviceType
 
 	// Fail on error or empty host or empty scheme
 	if err != nil || u.Host == "" || u.Scheme == "" {
@@ -79,7 +79,7 @@ func getServiceType(urlToParse string) (*errs.HTTPTypeError, ServiceType) {
 	}
 
 	// Only support github service today
-	service = ServiceType{
+	service = serviceType{
 		Service:  UNKNOWN,
 		Segments: segments,
 	}

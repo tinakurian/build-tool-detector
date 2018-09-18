@@ -20,16 +20,32 @@ import (
 	"github.com/google/go-github/github"
 )
 
+// Attributes used for retrieving
+// data using the go-github library.
+type serviceAttributes struct {
+	Owner      string
+	Repository string
+	Branch     string
+}
+
+const (
+	sMASTER = "master"
+	sTREE   = "tree"
+)
+
 var (
 	// ErrInternalServerError to return if unable to get contents
 	ErrInternalServerError = errors.New("Unable to retrieve contents")
+
+	// ErrBadRequest github url is invalid
+	ErrBadRequest = errors.New("github path is invalid")
 )
 
 // GetGithubService something
 func GetGithubService(ctx *app.ShowBuildToolDetectorContext, githubURL []string) (*errs.HTTPTypeError, *app.GoaBuildToolDetector) {
 	// GetAttributes returns a BadRequest error and
 	// will print the error to the user
-	httpTypeError, attributes := getAttributes(githubURL, ctx.Branch)
+	httpTypeError, attributes := getServiceAttributes(githubURL, ctx.Branch)
 	if httpTypeError != nil {
 		log.Printf("Error: %v", httpTypeError)
 		return httpTypeError, nil
@@ -52,7 +68,48 @@ func GetGithubService(ctx *app.ShowBuildToolDetectorContext, githubURL []string)
 	return nil, buildTool
 }
 
-func isMaven(ctx *app.ShowBuildToolDetectorContext, attributes Attributes) *errs.HTTPTypeError {
+// getServiceAttributes will use the path segments and
+// query params to populate the Attributes
+// struct. The attributes struct will be used
+// to make a request to github to determine
+// the build tool type.
+func getServiceAttributes(segments []string, ctxBranch *string) (*errs.HTTPTypeError, serviceAttributes) {
+
+	var attributes serviceAttributes
+
+	// Default branch that will be used if a branch
+	// is not passed in though the optional 'branch'
+	// query parameter and is not part of the url.
+	branch := sMASTER
+
+	if len(segments) <= 2 {
+		return errs.ErrBadRequest(ErrBadRequest), attributes
+	}
+
+	// If the query parameter field 'branch' is not
+	// empty then set the branch name to the query
+	// parameter value.
+	if ctxBranch != nil {
+		branch = *ctxBranch
+	} else if len(segments) > 3 {
+		// If the user has not specified the branch
+		// check whether it is passed in through
+		// the URL.
+		if segments[3] == sTREE {
+			branch = segments[4]
+		}
+	}
+
+	attributes = serviceAttributes{
+		Owner:      segments[1],
+		Repository: segments[2],
+		Branch:     branch,
+	}
+
+	return nil, attributes
+}
+
+func isMaven(ctx *app.ShowBuildToolDetectorContext, attributes serviceAttributes) *errs.HTTPTypeError {
 	client := github.NewClient(nil)
 	_, _, resp, err := client.Repositories.GetContents(
 		ctx, attributes.Owner,
