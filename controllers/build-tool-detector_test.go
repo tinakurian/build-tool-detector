@@ -7,6 +7,8 @@ and containing scaffold outputs.
 package controllers_test
 
 import (
+	"net/http"
+
 	"github.com/goadesign/goa"
 	. "github.com/onsi/ginkgo"
 	"github.com/onsi/gomega"
@@ -15,7 +17,6 @@ import (
 	"github.com/tinakurian/build-tool-detector/controllers/buildtype"
 	git "github.com/tinakurian/build-tool-detector/controllers/git"
 	"github.com/tinakurian/build-tool-detector/controllers/git/github"
-	"net/http"
 )
 
 var _ = Describe("BuildToolDetector", func() {

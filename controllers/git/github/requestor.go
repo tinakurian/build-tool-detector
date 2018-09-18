@@ -27,7 +27,14 @@ var (
 // file to determine whether the project is
 // built using maven.
 func getGithubRepositoryPom(ctx *app.ShowBuildToolDetectorContext, attributes Attributes) *errs.HTTPTypeError {
-	client := github.NewClient(nil)
+
+	t := github.UnauthenticatedRateLimitedTransport{
+		ClientID:     "a0e1ce33654a8446356b",
+		ClientSecret: "003e451564af39a5e29f768cbb9bcfd749577a31",
+	}
+
+	client := github.NewClient(t.Client())
+
 	_, _, resp, err := client.Repositories.GetContents(
 		ctx, attributes.Owner,
 		attributes.Repository,

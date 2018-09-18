@@ -1,10 +1,11 @@
 package git_test
 
 import (
+	"net/http"
+
 	. "github.com/onsi/ginkgo"
 	"github.com/onsi/gomega"
 	"github.com/tinakurian/build-tool-detector/controllers/git"
-	"net/http"
 )
 
 var _ = Describe("GitServiceType", func() {

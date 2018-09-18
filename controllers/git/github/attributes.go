@@ -38,7 +38,7 @@ var (
 // struct. The attributes struct will be used
 // to make a request to github to determine
 // the build tool type.
-func getAttributes(segments []string, ctxBranch *string) (*errs.HTTPTypeError, Attributes) {
+func GetAttributes(segments []string, ctxBranch *string) (*errs.HTTPTypeError, Attributes) {
 
 	var attributes Attributes
 
