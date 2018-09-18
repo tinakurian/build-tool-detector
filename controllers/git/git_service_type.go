@@ -12,11 +12,12 @@ maven.
 package git
 
 import (
+	"net/url"
+	"strings"
+
 	"github.com/tinakurian/build-tool-detector/app"
 	errs "github.com/tinakurian/build-tool-detector/controllers/error"
 	"github.com/tinakurian/build-tool-detector/controllers/git/github"
-	"net/url"
-	"strings"
 )
 
 // constants to define the different
@@ -84,9 +85,8 @@ func getServiceType(urlToParse string) (*errs.HTTPTypeError, serviceType) {
 		Segments: segments,
 	}
 
-	if u.Host == GITHUB+sDOTCOM || len(segments) < 2 {
+	if u.Host == GITHUB+sDOTCOM {
 		service.Service = GITHUB
-		return errs.ErrBadRequest(github.ErrBadRequest), service
 	}
 
 	return nil, service

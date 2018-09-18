@@ -11,13 +11,12 @@ package github
 
 import (
 	"errors"
+	"github.com/google/go-github/github"
 	"github.com/tinakurian/build-tool-detector/app"
 	"github.com/tinakurian/build-tool-detector/controllers/buildtype"
 	errs "github.com/tinakurian/build-tool-detector/controllers/error"
 	"log"
 	"net/http"
-
-	"github.com/google/go-github/github"
 )
 
 // Attributes used for retrieving
@@ -35,7 +34,7 @@ const (
 
 var (
 	// ErrInternalServerError to return if unable to get contents
-	ErrInternalServerError = errors.New("Unable to retrieve contents")
+	ErrInternalServerError = errors.New("unable to retrieve contents")
 
 	// ErrBadRequest github url is invalid
 	ErrBadRequest = errors.New("github path is invalid")
@@ -58,7 +57,7 @@ func GetGithubService(ctx *app.ShowBuildToolDetectorContext, githubURL []string)
 	httpTypeError = isMaven(ctx, attributes)
 	if httpTypeError != nil {
 		log.Printf("Error: %v", httpTypeError)
-		return httpTypeError, buildTool
+		return httpTypeError, nil
 	}
 
 	// Reset the buildToolType to maven since
@@ -123,7 +122,7 @@ func isMaven(ctx *app.ShowBuildToolDetectorContext, attributes serviceAttributes
 		"pom.xml",
 		&github.RepositoryContentGetOptions{Ref: attributes.Branch})
 
-	if err != nil || resp.StatusCode != http.StatusOK {
+	if err != nil && resp.StatusCode != http.StatusOK {
 		return errs.ErrInternalServerError(ErrInternalServerError)
 	}
 

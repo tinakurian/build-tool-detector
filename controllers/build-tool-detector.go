@@ -34,11 +34,12 @@ func NewBuildToolDetectorController(service *goa.Service) *BuildToolDetectorCont
 func (c *BuildToolDetectorController) Show(ctx *app.ShowBuildToolDetectorContext) error {
 
 	err, buildTool := service.GetService(ctx)
+	fmt.Printf("\n\n\n %s %s \n\n\n", err, "TINAAAAAAAAAAAAAAA")
 	if err != nil {
 		if err.StatusCode == http.StatusBadRequest {
 			return handleRequest(ctx, err, nil)
 		}
-		return handleRequest(ctx, nil, buildtype.Unknown())
+		return handleRequest(ctx, err, buildtype.Unknown())
 	}
 
 	return handleRequest(ctx, nil, buildTool)
