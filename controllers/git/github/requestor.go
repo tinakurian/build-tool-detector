@@ -11,11 +11,10 @@ package github
 
 import (
 	"errors"
-	"net/http"
-
 	"github.com/google/go-github/github"
 	"github.com/tinakurian/build-tool-detector/app"
 	errs "github.com/tinakurian/build-tool-detector/controllers/error"
+	"net/http"
 )
 
 var (
@@ -34,7 +33,6 @@ func getGithubRepositoryPom(ctx *app.ShowBuildToolDetectorContext, attributes At
 	}
 
 	client := github.NewClient(t.Client())
-
 	_, _, resp, err := client.Repositories.GetContents(
 		ctx, attributes.Owner,
 		attributes.Repository,

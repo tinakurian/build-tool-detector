@@ -7,8 +7,6 @@ and containing scaffold outputs.
 package controllers_test
 
 import (
-	"net/http"
-
 	"github.com/goadesign/goa"
 	. "github.com/onsi/ginkgo"
 	"github.com/onsi/gomega"
@@ -17,6 +15,9 @@ import (
 	"github.com/tinakurian/build-tool-detector/controllers/buildtype"
 	git "github.com/tinakurian/build-tool-detector/controllers/git"
 	"github.com/tinakurian/build-tool-detector/controllers/git/github"
+	"gopkg.in/h2non/gock.v1"
+	"io/ioutil"
+	"net/http"
 )
 
 var _ = Describe("BuildToolDetector", func() {
@@ -101,6 +102,23 @@ var _ = Describe("BuildToolDetector", func() {
 			err, attributes := github.GetAttributes(segments, nil)
 			gomega.Expect(err.StatusCode).Should(gomega.BeEquivalentTo(http.StatusBadRequest), "invalid url segments should be equivalent to a Bad Request")
 			gomega.Expect(attributes).Should(gomega.Equal(github.Attributes{}), "invalid url segments cause empty attributes")
+		})
+	})
+
+	Context("build-tool-detector - mock Okay", func() {
+		It("attributes - GetAttributes() use branch from url", func() {
+			defer gock.Off()
+			gock.New("http://localhost:8080/build-tool-detector/build-tool").
+				Get("/https://github.com/fabric8-launcher/launcher-backend").
+				Reply(200).
+				JSON(map[string]string{"build-tool-type": "maven"})
+
+			res, err := http.Get("http://localhost:8080/build-tool-detector/build-tool/https://github.com/fabric8-launcher/launcher-backend")
+			gomega.Expect(err).Should(gomega.BeNil())
+			gomega.Expect(res.StatusCode).Should(gomega.Equal(http.StatusOK))
+
+			body, _ := ioutil.ReadAll(res.Body)
+			gomega.Expect(GinkgoT(), string(body)[:13], `{"build-tool-type":"maven"}`)
 		})
 	})
 })
