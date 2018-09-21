@@ -77,5 +77,11 @@ var _ = Describe("BuildToolDetector", func() {
 			branch := "master"
 			test.ShowBuildToolDetectorOK(GinkgoT(), nil, nil, controllers.NewBuildToolDetectorController(service), "https://github.com/fabric8-services/fabric8-wit", &branch)
 		})
+
+		It("Build tool type to be Maven -- 200 Okay", func() {
+			service := goa.New("build-tool-detector")
+			_, buildTool := test.ShowBuildToolDetectorOK(GinkgoT(), nil, nil, controllers.NewBuildToolDetectorController(service), "https://github.com/fabric8-launcher/launcher-backend/tree/master", nil)
+			gomega.Expect(buildTool.BuildToolType).Should(gomega.BeEquivalentTo("maven"), "build type should be equivalent to 'maven'")
+		})
 	})
 })
