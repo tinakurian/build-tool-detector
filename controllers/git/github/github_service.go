@@ -17,6 +17,8 @@ import (
 	errs "github.com/tinakurian/build-tool-detector/controllers/error"
 	"log"
 	"net/http"
+	"net/url"
+	"strings"
 )
 
 // Attributes used for retrieving
@@ -33,18 +35,41 @@ const (
 )
 
 var (
-	// ErrInternalServerError to return if unable to get contents
-	ErrInternalServerError = errors.New("unable to retrieve contents")
+	// ErrInternalServerErrorFailedContentRetrieval to return if unable to get contents
+	ErrInternalServerErrorFailedContentRetrieval = errors.New("Unable to retrieve contents")
 
-	// ErrBadRequest github url is invalid
-	ErrBadRequest = errors.New("github path is invalid")
+	// ErrInternalServerErrorUnsupportedGithubURL BadRequest github url is invalid
+	ErrInternalServerErrorUnsupportedGithubURL = errors.New("Unsupported github url")
+
+	// ErrBadRequestInvalidPath BadRequest github url is invalid
+	ErrBadRequestInvalidPath = errors.New("URL is invalid")
+
+	// ErrInternalServerErrorUnsupportedService git service unsupported
+	ErrInternalServerErrorUnsupportedService = errors.New("Unsupported service")
+
+	// ErrNotFoundResource something
+	ErrNotFoundResource = errors.New("Resource not found")
 )
 
-// GetGithubService something
-func GetGithubService(ctx *app.ShowBuildToolDetectorContext, githubURL []string) (*errs.HTTPTypeError, *app.GoaBuildToolDetector) {
+// IGitHubService something
+type IGitHubService interface {
+	GetContents(ctx *app.ShowBuildToolDetectorContext) (*errs.HTTPTypeError, *app.GoaBuildToolDetector)
+}
+
+// GoooService something
+type GoooService struct{}
+
+// GetContents something
+func (g GoooService) GetContents(ctx *app.ShowBuildToolDetectorContext) (*errs.HTTPTypeError, *app.GoaBuildToolDetector) {
 	// GetAttributes returns a BadRequest error and
 	// will print the error to the user
-	httpTypeError, attributes := getServiceAttributes(githubURL, ctx.Branch)
+	u, err := url.Parse(ctx.URL)
+	if err != nil {
+		return errs.ErrBadRequest(ErrBadRequestInvalidPath), nil
+	}
+
+	segments := strings.Split(u.Path, "/")
+	httpTypeError, attributes := getServiceAttributes(segments, ctx.Branch)
 	if httpTypeError != nil {
 		log.Printf("Error: %v", httpTypeError)
 		return httpTypeError, nil
@@ -82,7 +107,7 @@ func getServiceAttributes(segments []string, ctxBranch *string) (*errs.HTTPTypeE
 	branch := sMASTER
 
 	if len(segments) <= 2 {
-		return errs.ErrBadRequest(ErrBadRequest), attributes
+		return errs.ErrBadRequest(ErrBadRequestInvalidPath), attributes
 	}
 
 	// If the query parameter field 'branch' is not
@@ -90,7 +115,7 @@ func getServiceAttributes(segments []string, ctxBranch *string) (*errs.HTTPTypeE
 	// parameter value.
 	if ctxBranch != nil {
 		branch = *ctxBranch
-	} else if len(segments) > 3 {
+	} else if len(segments) > 4 {
 		// If the user has not specified the branch
 		// check whether it is passed in through
 		// the URL.
@@ -116,6 +141,11 @@ func isMaven(ctx *app.ShowBuildToolDetectorContext, attributes serviceAttributes
 	}
 
 	client := github.NewClient(t.Client())
+
+	_, _, err := client.Repositories.GetBranch(ctx, attributes.Owner, attributes.Repository, attributes.Branch)
+	if err != nil {
+		return errs.ErrNotFoundError(ErrNotFoundResource)
+	}
 	_, _, resp, err := client.Repositories.GetContents(
 		ctx, attributes.Owner,
 		attributes.Repository,
@@ -123,7 +153,7 @@ func isMaven(ctx *app.ShowBuildToolDetectorContext, attributes serviceAttributes
 		&github.RepositoryContentGetOptions{Ref: attributes.Branch})
 
 	if err != nil && resp.StatusCode != http.StatusOK {
-		return errs.ErrInternalServerError(ErrInternalServerError)
+		return errs.ErrInternalServerError(ErrInternalServerErrorFailedContentRetrieval)
 	}
 
 	return nil

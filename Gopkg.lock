@@ -164,12 +164,6 @@
 
 [[projects]]
   branch = "master"
-  name = "github.com/toolkits/sys"
-  packages = ["."]
-  revision = "1f33b217ffafd62561fa8f5b4977dfe3099f47e3"
-
-[[projects]]
-  branch = "master"
   name = "github.com/zach-klippenstein/goregen"
   packages = ["."]
   revision = "795b5e3961ea1912fde60af417ad85e86acc0d6a"
@@ -243,6 +237,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "2bba08c657ee5103d35d9ef6a0e62e9b051bb3b0e5c46f62d7af15a5d5bb090e"
+  inputs-digest = "d00c042550da7ee39b135d65f1f6957f68a064aea04a41287e2a78e13e98d656"
   solver-name = "gps-cdcl"
   solver-version = 1

@@ -39,3 +39,13 @@ func ErrInternalServerError(err error) *HTTPTypeError {
 		Error:         err.Error(),
 	}
 }
+
+// ErrNotFoundError resource not found error
+func ErrNotFoundError(err error) *HTTPTypeError {
+
+	return &HTTPTypeError{
+		StatusCode:    http.StatusNotFound,
+		StatusMessage: http.StatusText(http.StatusNotFound),
+		Error:         err.Error(),
+	}
+}

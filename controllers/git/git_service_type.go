@@ -12,12 +12,10 @@ maven.
 package git
 
 import (
-	"net/url"
-	"strings"
-
-	"github.com/tinakurian/build-tool-detector/app"
 	errs "github.com/tinakurian/build-tool-detector/controllers/error"
 	"github.com/tinakurian/build-tool-detector/controllers/git/github"
+	"net/url"
+	"strings"
 )
 
 // constants to define the different
@@ -35,59 +33,44 @@ const (
 	sSLASH  = "/"
 )
 
-// serviceType contains the service
-// and path segments
-type serviceType struct {
-	Service  string
-	Segments []string
+// Service something
+type Service struct{}
+
+// IService something
+type IService interface {
+	GetGitHubService(string)
 }
 
-// GetGitService something
-func GetGitService(ctx *app.ShowBuildToolDetectorContext) (*errs.HTTPTypeError, *app.GoaBuildToolDetector) {
-	// Only support Github
-	err, service := getServiceType(ctx.URL)
-	if err != nil {
-		return err, nil
-	}
-
-	// If the type is Github, get the build tool
-	err, buildTool := github.GetGithubService(ctx, service.Segments)
-	if err != nil {
-		return err, nil
-	}
-
-	return nil, buildTool
+// GetGitHubService something
+func (g Service) GetGitHubService() *github.GoooService {
+	return &github.GoooService{}
 }
 
-// GetServiceType performs a simple url parse and split
+// GetGitServiceType performs a simple url parse and split
 // in order to retrieve the owner, repository
 // and potentially the branch.
 //
 // Note: This method will likely need to be enhanced
 // to handle different github url formats.
-func getServiceType(urlToParse string) (*errs.HTTPTypeError, serviceType) {
+func GetGitServiceType(urlToParse string) (*string, *errs.HTTPTypeError) {
+	gitServiceType := GITHUB
+
 	u, err := url.Parse(urlToParse)
-	var service serviceType
 
 	// Fail on error or empty host or empty scheme
 	if err != nil || u.Host == "" || u.Scheme == "" {
-		return errs.ErrBadRequest(github.ErrBadRequest), service
+		return nil, errs.ErrBadRequest(github.ErrBadRequestInvalidPath)
+	}
+
+	// Currently only support Github
+	if u.Host != GITHUB+sDOTCOM {
+		return nil, errs.ErrInternalServerError(github.ErrInternalServerErrorUnsupportedService)
 	}
 
 	segments := strings.Split(u.Path, sSLASH)
-	if len(segments) < 2 {
-		return errs.ErrBadRequest(github.ErrBadRequest), service
+	if len(segments) < 3 {
+		return nil, errs.ErrBadRequest(github.ErrInternalServerErrorUnsupportedGithubURL)
 	}
 
-	// Only support github service today
-	service = serviceType{
-		Service:  UNKNOWN,
-		Segments: segments,
-	}
-
-	if u.Host == GITHUB+sDOTCOM {
-		service.Service = GITHUB
-	}
-
-	return nil, service
+	return &gitServiceType, nil
 }

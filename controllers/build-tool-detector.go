@@ -11,6 +11,7 @@ package controllers
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/tinakurian/build-tool-detector/controllers/git"
 	"net/http"
 
 	"github.com/goadesign/goa"
@@ -33,7 +34,14 @@ func NewBuildToolDetectorController(service *goa.Service) *BuildToolDetectorCont
 // Show runs the show action.
 func (c *BuildToolDetectorController) Show(ctx *app.ShowBuildToolDetectorContext) error {
 
-	err, buildTool := service.GetService(ctx)
+	gitService := service.System{}.GetGitService()
+
+	_, err := git.GetGitServiceType(ctx.URL)
+	if err != nil {
+		return handleRequest(ctx, err, nil)
+	}
+
+	err, buildTool := gitService.GetGitHubService().GetContents(ctx)
 	if err != nil {
 		if err.StatusCode == http.StatusBadRequest {
 			return handleRequest(ctx, err, nil)
@@ -47,28 +55,25 @@ func (c *BuildToolDetectorController) Show(ctx *app.ShowBuildToolDetectorContext
 func handleRequest(ctx *app.ShowBuildToolDetectorContext, httpTypeError *errs.HTTPTypeError, buildTool *app.GoaBuildToolDetector) error {
 	ctx.ResponseWriter.Header().Set("Content-Type", "application/json")
 
-	if httpTypeError != nil {
-		ctx.WriteHeader(httpTypeError.StatusCode)
-		if _, err := fmt.Fprint(ctx.ResponseWriter, string(marshalJSON(httpTypeError))); err != nil {
-			panic(err)
+	if httpTypeError == nil || httpTypeError.StatusCode == http.StatusInternalServerError {
+		if buildTool != nil {
+			return ctx.OK(buildTool)
 		}
 	}
 
-	if httpTypeError == nil {
-		return ctx.OK(buildTool)
-	}
-
-	return getErrResponse(ctx, httpTypeError)
-}
-
-func marshalJSON(httpTypeError *errs.HTTPTypeError) []byte {
-
+	ctx.WriteHeader(httpTypeError.StatusCode)
 	jsonHTTPTypeError, err := json.Marshal(httpTypeError)
 	if err != nil {
+		// TODO: log and return error
 		panic(err)
 	}
 
-	return jsonHTTPTypeError
+	if _, err := fmt.Fprint(ctx.ResponseWriter, string(jsonHTTPTypeError)); err != nil {
+		// TODO: log and return error
+		panic(err)
+	}
+
+	return getErrResponse(ctx, httpTypeError)
 }
 
 func getErrResponse(ctx *app.ShowBuildToolDetectorContext, httpTypeError *errs.HTTPTypeError) error {
