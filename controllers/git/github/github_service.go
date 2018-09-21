@@ -142,10 +142,13 @@ func isMaven(ctx *app.ShowBuildToolDetectorContext, attributes serviceAttributes
 
 	client := github.NewClient(t.Client())
 
+	// Check that the repository + branch exists first
 	_, _, err := client.Repositories.GetBranch(ctx, attributes.Owner, attributes.Repository, attributes.Branch)
 	if err != nil {
 		return errs.ErrNotFoundError(ErrNotFoundResource)
 	}
+
+	// If the repository and branch exists, get the contents for the repository
 	_, _, resp, err := client.Repositories.GetContents(
 		ctx, attributes.Owner,
 		attributes.Repository,
