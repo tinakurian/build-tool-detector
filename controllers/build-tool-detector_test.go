@@ -32,10 +32,22 @@ var _ = Describe("BuildToolDetector", func() {
 			test.ShowBuildToolDetectorNotFound(GinkgoT(), nil, nil, controllers.NewBuildToolDetectorController(service), "https://github.com/fabric8-launcher/launcher-backend", &branch)
 		})
 
-		It("Build tool type expected to be Unknown -- 500 Internal Server Error", func() {
+		It("Non-existent branch name -- 500 Internal Server Error", func() {
 			service := goa.New("build-tool-detector")
-			branch := "master"
-			test.ShowBuildToolDetectorOK(GinkgoT(), nil, nil, controllers.NewBuildToolDetectorController(service), "https://github.com/fabric8-services/fabric8-wit", &branch)
+			branch := "masterz"
+			test.ShowBuildToolDetectorBadRequest(GinkgoT(), nil, nil, controllers.NewBuildToolDetectorController(service), "fabric8-launcher/launcher-backend", &branch)
+		})
+
+		It("Non-existent branch name -- 500 Internal Server Error", func() {
+			service := goa.New("build-tool-detector")
+			branch := "masterz"
+			test.ShowBuildToolDetectorInternalServerError(GinkgoT(), nil, nil, controllers.NewBuildToolDetectorController(service), "http://gitlab.com/fabric8-launcher/launcher-backend", &branch)
+		})
+
+		It("Non-existent branch name -- 500 Internal Server Error", func() {
+			service := goa.New("build-tool-detector")
+			branch := "masterz"
+			test.ShowBuildToolDetectorBadRequest(GinkgoT(), nil, nil, controllers.NewBuildToolDetectorController(service), "", &branch)
 		})
 	})
 
@@ -58,6 +70,12 @@ var _ = Describe("BuildToolDetector", func() {
 			branch := "master"
 			_, buildTool := test.ShowBuildToolDetectorOK(GinkgoT(), nil, nil, controllers.NewBuildToolDetectorController(service), "https://github.com/fabric8-launcher/launcher-backend", &branch)
 			gomega.Expect(buildTool.BuildToolType).Should(gomega.BeEquivalentTo("maven"), "build type should be equivalent to 'maven'")
+		})
+
+		It("Build tool type expected to be Unknown -- 200 Okay", func() {
+			service := goa.New("build-tool-detector")
+			branch := "master"
+			test.ShowBuildToolDetectorOK(GinkgoT(), nil, nil, controllers.NewBuildToolDetectorController(service), "https://github.com/fabric8-services/fabric8-wit", &branch)
 		})
 	})
 })
