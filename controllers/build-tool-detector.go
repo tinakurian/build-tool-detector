@@ -11,14 +11,13 @@ package controllers
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/tinakurian/build-tool-detector/controllers/git"
-	"net/http"
-
 	"github.com/goadesign/goa"
 	"github.com/tinakurian/build-tool-detector/app"
 	"github.com/tinakurian/build-tool-detector/controllers/buildtype"
 	errs "github.com/tinakurian/build-tool-detector/controllers/error"
+	"github.com/tinakurian/build-tool-detector/controllers/git"
 	"github.com/tinakurian/build-tool-detector/controllers/system"
+	"net/http"
 )
 
 // BuildToolDetectorController implements the build-tool-detector resource.
@@ -33,14 +32,12 @@ func NewBuildToolDetectorController(service *goa.Service) *BuildToolDetectorCont
 
 // Show runs the show action.
 func (c *BuildToolDetectorController) Show(ctx *app.ShowBuildToolDetectorContext) error {
-
-	gitService := system.System{}.GetGitService()
-
 	_, err := git.GetGitServiceType(ctx.URL)
 	if err != nil {
 		return handleRequest(ctx, err, nil)
 	}
 
+	gitService := system.System{}.GetGitService()
 	err, buildTool := gitService.GetGitHubService().GetContents(ctx)
 	if err != nil {
 		if err.StatusCode == http.StatusBadRequest {
