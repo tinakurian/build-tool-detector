@@ -18,7 +18,7 @@ import (
 	"github.com/tinakurian/build-tool-detector/app"
 	"github.com/tinakurian/build-tool-detector/controllers/buildtype"
 	errs "github.com/tinakurian/build-tool-detector/controllers/error"
-	"github.com/tinakurian/build-tool-detector/controllers/service"
+	"github.com/tinakurian/build-tool-detector/controllers/system"
 )
 
 // BuildToolDetectorController implements the build-tool-detector resource.
@@ -34,7 +34,7 @@ func NewBuildToolDetectorController(service *goa.Service) *BuildToolDetectorCont
 // Show runs the show action.
 func (c *BuildToolDetectorController) Show(ctx *app.ShowBuildToolDetectorContext) error {
 
-	gitService := service.System{}.GetGitService()
+	gitService := system.System{}.GetGitService()
 
 	_, err := git.GetGitServiceType(ctx.URL)
 	if err != nil {

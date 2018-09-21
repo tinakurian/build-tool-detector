@@ -35,7 +35,7 @@ var _ = Describe("GitServiceType", func() {
 			gomega.Expect(err.StatusCode).Should(gomega.BeEquivalentTo(http.StatusBadRequest), "service type should be 'nil'")
 		})
 
-		It("Correct url", func() {
+		It("Correct url - non-existent", func() {
 			serviceType, err := GetGitServiceType("http://github.com/test/test")
 			gomega.Expect(serviceType).ShouldNot(gomega.BeNil(), "service type should be 'nil'")
 			gomega.Expect(err).Should(gomega.BeNil(), "service type should be 'nil'")
@@ -55,7 +55,7 @@ var _ = Describe("GitServiceType", func() {
 	Context("Service", func() {
 		It("Github", func() {
 			service := Service{}.GetGitHubService()
-			gomega.Expect(service).Should(gomega.BeEquivalentTo(&github.GoooService{}), "service type should be 'nil'")
+			gomega.Expect(service).Should(gomega.BeEquivalentTo(&github.GitService{}), "service type should be 'nil'")
 		})
 	})
 })

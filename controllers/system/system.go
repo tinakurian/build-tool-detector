@@ -1,18 +1,18 @@
-package service
+package system
 
 import (
 	"github.com/tinakurian/build-tool-detector/controllers/git"
 )
 
-// System something
+// System struct
 type System struct{}
 
-// ISystem something
+// ISystem interface
 type ISystem interface {
 	GetGitService()
 }
 
-// GetGitService something
+// GetGitService gets the git service
 func (s System) GetGitService() git.Service {
 	return git.Service{}
 }

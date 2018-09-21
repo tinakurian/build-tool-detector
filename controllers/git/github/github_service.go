@@ -47,20 +47,20 @@ var (
 	// ErrInternalServerErrorUnsupportedService git service unsupported
 	ErrInternalServerErrorUnsupportedService = errors.New("Unsupported service")
 
-	// ErrNotFoundResource something
+	// ErrNotFoundResource no resource found
 	ErrNotFoundResource = errors.New("Resource not found")
 )
 
-// IGitHubService something
-type IGitHubService interface {
+// IGitService git service interface
+type IGitService interface {
 	GetContents(ctx *app.ShowBuildToolDetectorContext) (*errs.HTTPTypeError, *app.GoaBuildToolDetector)
 }
 
-// GoooService something
-type GoooService struct{}
+// GitService struct
+type GitService struct{}
 
-// GetContents something
-func (g GoooService) GetContents(ctx *app.ShowBuildToolDetectorContext) (*errs.HTTPTypeError, *app.GoaBuildToolDetector) {
+// GetContents gets the contents for the service
+func (g GitService) GetContents(ctx *app.ShowBuildToolDetectorContext) (*errs.HTTPTypeError, *app.GoaBuildToolDetector) {
 	// GetAttributes returns a BadRequest error and
 	// will print the error to the user
 	u, err := url.Parse(ctx.URL)
@@ -139,7 +139,6 @@ func isMaven(ctx *app.ShowBuildToolDetectorContext, attributes serviceAttributes
 		ClientID:     "a0e1ce33654a8446356b",
 		ClientSecret: "003e451564af39a5e29f768cbb9bcfd749577a31",
 	}
-
 	client := github.NewClient(t.Client())
 
 	// Check that the repository + branch exists first
@@ -154,7 +153,6 @@ func isMaven(ctx *app.ShowBuildToolDetectorContext, attributes serviceAttributes
 		attributes.Repository,
 		"pom.xml",
 		&github.RepositoryContentGetOptions{Ref: attributes.Branch})
-
 	if err != nil && resp.StatusCode != http.StatusOK {
 		return errs.ErrInternalServerError(ErrInternalServerErrorFailedContentRetrieval)
 	}

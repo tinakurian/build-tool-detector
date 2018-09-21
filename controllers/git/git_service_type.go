@@ -33,17 +33,17 @@ const (
 	sSLASH  = "/"
 )
 
-// Service something
+// Service struct
 type Service struct{}
 
-// IService something
+// IService service interface
 type IService interface {
 	GetGitHubService(string)
 }
 
-// GetGitHubService something
-func (g Service) GetGitHubService() *github.GoooService {
-	return &github.GoooService{}
+// GetGitHubService gets the github service
+func (s Service) GetGitHubService() *github.GitService {
+	return &github.GitService{}
 }
 
 // GetGitServiceType performs a simple url parse and split
