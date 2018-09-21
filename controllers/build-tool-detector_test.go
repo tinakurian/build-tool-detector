@@ -46,8 +46,7 @@ var _ = Describe("BuildToolDetector", func() {
 
 		It("Non-existent branch name -- 500 Internal Server Error", func() {
 			service := goa.New("build-tool-detector")
-			branch := "masterz"
-			test.ShowBuildToolDetectorBadRequest(GinkgoT(), nil, nil, controllers.NewBuildToolDetectorController(service), "", &branch)
+			test.ShowBuildToolDetectorBadRequest(GinkgoT(), nil, nil, controllers.NewBuildToolDetectorController(service), "", nil)
 		})
 	})
 
