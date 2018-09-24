@@ -94,7 +94,7 @@ var _ = Describe("BuildToolDetector", func() {
 
 	Context("Generate Test Files", func() {
 		It("Bad Request Invalid URL", func() {
-			command := exec.Command("curl", "http://localhost:8080/build-tool-detector/build-tool/hi%2Fhi")
+			command := exec.Command("curl", "http://localhost:8080/build-tool-detector/build-tool/test%2Ftest")
 			var out bytes.Buffer
 			command.Stdout = &out
 			err := command.Run()
@@ -171,11 +171,11 @@ var _ = Describe("BuildToolDetector", func() {
 			defer gock.Off()
 
 			gock.New("http://localhost:8080/build-tool-detector/build-tool").
-				Get("/hi/hi").
+				Get("/test/test").
 				Reply(400).
 				JSON(map[string]interface{}{"StatusCode": 400, "StatusMessage": "Bad Request", "Error": "URL is invalid"})
 
-			res, err := http.Get("http://localhost:8080/build-tool-detector/build-tool/hi/hi")
+			res, err := http.Get("http://localhost:8080/build-tool-detector/build-tool/test/test")
 			gomega.Expect(GinkgoT(), err, nil)
 			gomega.Expect(res.StatusCode).Should(gomega.BeEquivalentTo(400), "response status code should be 400'")
 			resBody, _ := ioutil.ReadFile("../controllers/test/truth_files/001_bad_request_invalid_url.json")
