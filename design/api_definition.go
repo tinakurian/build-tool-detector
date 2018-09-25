@@ -1,3 +1,9 @@
+/*
+
+Package design is used to develop
+the REST endpoints for the build tool.
+
+*/
 package design
 
 import (

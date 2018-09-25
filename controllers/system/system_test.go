@@ -1,7 +1,7 @@
 /*
 
-Package git_test is used to test the functionality
-within the github package.
+Package git_test is used to test the
+functionality within the github package.
 
 */
 package system_test

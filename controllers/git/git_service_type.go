@@ -34,15 +34,15 @@ const (
 	slash  = "/"
 )
 
-// Service struct
+// Service struct.
 type Service struct{}
 
-// IService service interface
+// IService service interface.
 type IService interface {
 	GetGitHubService(string)
 }
 
-// GetGitHubService gets the github service
+// GetGitHubService gets the github service.
 func (s Service) GetGitHubService() *github.GitService {
 	return &github.GitService{}
 }
@@ -58,12 +58,12 @@ func GetGitServiceType(urlToParse string) (*string, *errs.HTTPTypeError) {
 
 	u, err := url.Parse(urlToParse)
 
-	// Fail on error or empty host or empty scheme
+	// Fail on error or empty host or empty scheme.
 	if err != nil || u.Host == "" || u.Scheme == "" {
 		return nil, errs.ErrBadRequest(github.ErrBadRequestInvalidPath)
 	}
 
-	// Currently only support Github
+	// Currently only support Github.
 	if u.Host != Github+dotcom {
 		return nil, errs.ErrInternalServerError(github.ErrInternalServerErrorUnsupportedService)
 	}

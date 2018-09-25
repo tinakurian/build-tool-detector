@@ -1,7 +1,7 @@
 /*
 
 Package buildtype_test tests
-the buildtype package
+the buildtype package.
 
 */
 package buildtype_test

@@ -13,14 +13,14 @@ import (
 
 // HTTPTypeError defines a struct to return
 // errors with some additional
-// information
+// information.
 type HTTPTypeError struct {
 	StatusCode    int
 	StatusMessage string
 	Error         string
 }
 
-// ErrBadRequest bad request error
+// ErrBadRequest bad request error.
 func ErrBadRequest(err error) *HTTPTypeError {
 
 	return &HTTPTypeError{
@@ -30,7 +30,7 @@ func ErrBadRequest(err error) *HTTPTypeError {
 	}
 }
 
-// ErrInternalServerError bad request error
+// ErrInternalServerError bad request error.
 func ErrInternalServerError(err error) *HTTPTypeError {
 
 	return &HTTPTypeError{
@@ -40,7 +40,7 @@ func ErrInternalServerError(err error) *HTTPTypeError {
 	}
 }
 
-// ErrNotFoundError resource not found error
+// ErrNotFoundError resource not found error.
 func ErrNotFoundError(err error) *HTTPTypeError {
 
 	return &HTTPTypeError{

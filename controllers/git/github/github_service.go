@@ -36,34 +36,34 @@ const (
 )
 
 var (
-	// ErrInternalServerErrorFailedContentRetrieval to return if unable to get contents
+	// ErrInternalServerErrorFailedContentRetrieval to return if unable to get contents.
 	ErrInternalServerErrorFailedContentRetrieval = errors.New("Unable to retrieve contents")
 
-	// ErrInternalServerErrorUnsupportedGithubURL BadRequest github url is invalid
+	// ErrInternalServerErrorUnsupportedGithubURL BadRequest github url is invalid.
 	ErrInternalServerErrorUnsupportedGithubURL = errors.New("Unsupported github url")
 
-	// ErrBadRequestInvalidPath BadRequest github url is invalid
+	// ErrBadRequestInvalidPath BadRequest github url is invalid.
 	ErrBadRequestInvalidPath = errors.New("URL is invalid")
 
-	// ErrInternalServerErrorUnsupportedService git service unsupported
+	// ErrInternalServerErrorUnsupportedService git service unsupported.
 	ErrInternalServerErrorUnsupportedService = errors.New("Unsupported service")
 
-	// ErrNotFoundResource no resource found
+	// ErrNotFoundResource no resource found.
 	ErrNotFoundResource = errors.New("Resource not found")
 )
 
-// IGitService git service interface
+// IGitService git service interface.
 type IGitService interface {
 	GetContents(ctx *app.ShowBuildToolDetectorContext) (*errs.HTTPTypeError, *app.GoaBuildToolDetector)
 }
 
-// GitService struct
+// GitService struct.
 type GitService struct{}
 
-// GetContents gets the contents for the service
+// GetContents gets the contents for the service.
 func (g GitService) GetContents(ctx *app.ShowBuildToolDetectorContext) (*errs.HTTPTypeError, *app.GoaBuildToolDetector) {
 	// GetAttributes returns a BadRequest error and
-	// will print the error to the user
+	// will print the error to the user.
 	u, err := url.Parse(ctx.URL)
 	if err != nil {
 		return errs.ErrBadRequest(ErrBadRequestInvalidPath), nil
@@ -78,7 +78,7 @@ func (g GitService) GetContents(ctx *app.ShowBuildToolDetectorContext) (*errs.HT
 
 	// getGithubRepositoryPom returns an
 	// InternalServerError and will print
-	// the buildTool as unknown
+	// the buildTool as unknown.
 	buildTool := buildtype.Unknown()
 	httpTypeError = isMaven(ctx, attributes)
 	if httpTypeError != nil {
@@ -142,13 +142,13 @@ func isMaven(ctx *app.ShowBuildToolDetectorContext, attributes serviceAttributes
 	}
 	client := github.NewClient(t.Client())
 
-	// Check that the repository + branch exists first
+	// Check that the repository + branch exists first.
 	_, _, err := client.Repositories.GetBranch(ctx, attributes.Owner, attributes.Repository, attributes.Branch)
 	if err != nil {
 		return errs.ErrNotFoundError(ErrNotFoundResource)
 	}
 
-	// If the repository and branch exists, get the contents for the repository
+	// If the repository and branch exists, get the contents for the repository.
 	_, _, resp, err := client.Repositories.GetContents(
 		ctx, attributes.Owner,
 		attributes.Repository,

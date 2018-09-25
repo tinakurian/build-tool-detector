@@ -1,3 +1,9 @@
+/*
+
+Package git_test is used to test the functionality
+within the error package.
+
+*/
 package error_test
 
 import (

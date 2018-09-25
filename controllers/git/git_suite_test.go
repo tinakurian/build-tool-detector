@@ -1,3 +1,9 @@
+/*
+
+Package git_test is used to test the functionality
+within the git package.
+
+*/
 package git_test
 
 import (
