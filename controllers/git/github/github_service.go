@@ -20,6 +20,7 @@ import (
 	"github.com/tinakurian/build-tool-detector/app"
 	"github.com/tinakurian/build-tool-detector/controllers/buildtype"
 	errs "github.com/tinakurian/build-tool-detector/controllers/error"
+	"os"
 )
 
 // serviceAttributes used for retrieving
@@ -138,9 +139,10 @@ func getServiceAttributes(segments []string, ctxBranch *string) (*errs.HTTPTypeE
 func isMaven(ctx *app.ShowBuildToolDetectorContext, attributes serviceAttributes) *errs.HTTPTypeError {
 
 	t := github.UnauthenticatedRateLimitedTransport{
-		ClientID:     "a0e1ce33654a8446356b",
-		ClientSecret: "003e451564af39a5e29f768cbb9bcfd749577a31",
+		ClientID:     os.Getenv("GITHUB_CLIENT_ID"),
+		ClientSecret: os.Getenv("GITHUB_CLIENT_SECRET"),
 	}
+
 	client := github.NewClient(t.Client())
 
 	// Check that the repository + branch exists first.
