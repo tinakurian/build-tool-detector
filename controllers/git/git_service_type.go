@@ -12,10 +12,11 @@ maven.
 package git
 
 import (
-	errs "github.com/tinakurian/build-tool-detector/controllers/error"
-	"github.com/tinakurian/build-tool-detector/controllers/git/github"
 	"net/url"
 	"strings"
+
+	errs "github.com/tinakurian/build-tool-detector/controllers/error"
+	"github.com/tinakurian/build-tool-detector/controllers/git/github"
 )
 
 // constants to define the different

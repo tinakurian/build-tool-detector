@@ -2,10 +2,11 @@ package error_test
 
 import (
 	"errors"
+	"net/http"
+
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/tinakurian/build-tool-detector/controllers/error"
-	"net/http"
 )
 
 var _ = Describe("Error", func() {

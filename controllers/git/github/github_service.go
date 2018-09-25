@@ -11,14 +11,15 @@ package github
 
 import (
 	"errors"
-	"github.com/google/go-github/github"
-	"github.com/tinakurian/build-tool-detector/app"
-	"github.com/tinakurian/build-tool-detector/controllers/buildtype"
-	errs "github.com/tinakurian/build-tool-detector/controllers/error"
 	"log"
 	"net/http"
 	"net/url"
 	"strings"
+
+	"github.com/google/go-github/github"
+	"github.com/tinakurian/build-tool-detector/app"
+	"github.com/tinakurian/build-tool-detector/controllers/buildtype"
+	errs "github.com/tinakurian/build-tool-detector/controllers/error"
 )
 
 // Attributes used for retrieving

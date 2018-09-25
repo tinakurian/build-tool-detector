@@ -7,13 +7,14 @@ and containing scaffold outputs.
 package controllers_test
 
 import (
+	"io/ioutil"
+
 	"github.com/goadesign/goa"
 	. "github.com/onsi/ginkgo"
 	"github.com/onsi/gomega"
 	"github.com/tinakurian/build-tool-detector/app/test"
 	controllers "github.com/tinakurian/build-tool-detector/controllers"
 	"gopkg.in/h2non/gock.v1"
-	"io/ioutil"
 )
 
 var _ = Describe("BuildToolDetector", func() {
