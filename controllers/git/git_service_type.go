@@ -34,42 +34,44 @@ const (
 	sSLASH  = "/"
 )
 
-// ServiceType contains the service
-// and path segments
-type ServiceType struct {
-	Service  string
-	Segments []string
+// Service struct
+type Service struct{}
+
+// IService service interface
+type IService interface {
+	GetGitHubService(string)
 }
 
-// GetServiceType performs a simple url parse and split
+// GetGitHubService gets the github service
+func (s Service) GetGitHubService() *github.GitService {
+	return &github.GitService{}
+}
+
+// GetGitServiceType performs a simple url parse and split
 // in order to retrieve the owner, repository
 // and potentially the branch.
 //
 // Note: This method will likely need to be enhanced
 // to handle different github url formats.
-func GetServiceType(urlToParse string) (*errs.HTTPTypeError, ServiceType) {
+func GetGitServiceType(urlToParse string) (*string, *errs.HTTPTypeError) {
+	gitServiceType := GITHUB
+
 	u, err := url.Parse(urlToParse)
-	var service ServiceType
 
 	// Fail on error or empty host or empty scheme
 	if err != nil || u.Host == "" || u.Scheme == "" {
-		return errs.ErrBadRequest(github.ErrBadRequest), service
+		return nil, errs.ErrBadRequest(github.ErrBadRequestInvalidPath)
+	}
+
+	// Currently only support Github
+	if u.Host != GITHUB+sDOTCOM {
+		return nil, errs.ErrInternalServerError(github.ErrInternalServerErrorUnsupportedService)
 	}
 
 	segments := strings.Split(u.Path, sSLASH)
-	if len(segments) < 2 {
-		return errs.ErrBadRequest(github.ErrBadRequest), service
+	if len(segments) < 3 {
+		return nil, errs.ErrBadRequest(github.ErrInternalServerErrorUnsupportedGithubURL)
 	}
 
-	// Only support github service today
-	service = ServiceType{
-		Service:  UNKNOWN,
-		Segments: segments,
-	}
-
-	if u.Host == GITHUB+sDOTCOM || len(segments) < 2 {
-		service.Service = GITHUB
-	}
-
-	return nil, service
+	return &gitServiceType, nil
 }

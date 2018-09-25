@@ -78,6 +78,9 @@ tools: ## Installs all necessary tools
 	@echo "Installing ginkgo"
 	@go get -u github.com/onsi/ginkgo/ginkgo
 
+	@echo "Installing gock"
+	@go get -u gopkg.in/h2non/gock.v1
+	
 	@echo "Installing goimports"
 	@go get -u golang.org/x/tools/cmd/goimports
 

@@ -4,41 +4,58 @@ import (
 	"net/http"
 
 	. "github.com/onsi/ginkgo"
-	"github.com/onsi/gomega"
+	. "github.com/onsi/gomega"
 	"github.com/tinakurian/build-tool-detector/controllers/git"
+	"github.com/tinakurian/build-tool-detector/controllers/git/github"
 )
 
 var _ = Describe("GitServiceType", func() {
-
-	Context("build-tool-detector/controllers/git", func() {
-		It("git_service_type - GetServiceType() service github", func() {
-			_, gitService := git.GetServiceType("https://github.com/owner/repo/tree/branch")
-
-			gomega.Expect(gitService.Service).Should(gomega.BeEquivalentTo("github"), "git service should be equivalent to 'github'")
-			gomega.Expect(gitService.Segments[1]).Should(gomega.BeEquivalentTo("owner"), "1st segment from url should be 'owner'")
-			gomega.Expect(gitService.Segments[2]).Should(gomega.BeEquivalentTo("repo"), "2nd segment from url should be 'repo'")
-			gomega.Expect(gitService.Segments[3]).Should(gomega.BeEquivalentTo("tree"), "third segment from url should be 'tree'")
-			gomega.Expect(gitService.Segments[4]).Should(gomega.BeEquivalentTo("branch"), "fourth segment from url should be 'branch'")
+	Context("GetGitServiceType", func() {
+		It("Faulty Host - empty", func() {
+			serviceType, err := git.GetGitServiceType("")
+			Expect(serviceType).Should(BeNil(), "service type should be 'nil'")
+			Expect(err.StatusCode).Should(BeEquivalentTo(http.StatusBadRequest), "service type should be 'nil'")
 		})
 
-		It("git_service_type - GetServiceType() service unknown", func() {
-			_, gitService := git.GetServiceType("https://test.com/test/test/tree/master")
-			gomega.Expect(gitService.Service).Should(gomega.BeEquivalentTo("unknown"), "git service should be equivalent to 'unknown'")
+		It("Faulty Host - non-existent", func() {
+			serviceType, err := git.GetGitServiceType("test/test")
+			Expect(serviceType).Should(BeNil(), "service type should be 'nil'")
+			Expect(err.StatusCode).Should(BeEquivalentTo(http.StatusBadRequest), "service type should be 'nil'")
 		})
 
-		It("git_service_type - GetServiceType() bad request with no owner or repository", func() {
-			err, _ := git.GetServiceType("https://test.com")
-			gomega.Expect(err.StatusCode).Should(gomega.BeEquivalentTo(http.StatusBadRequest), "git service should be equivalent to 'http.StatusBadRequest'")
+		It("Faulty Host - not github.com", func() {
+			serviceType, err := git.GetGitServiceType("http://test.com/test/test")
+			Expect(serviceType).Should(BeNil(), "service type should be 'nil'")
+			Expect(err.StatusCode).Should(BeEquivalentTo(http.StatusInternalServerError), "service type should be 'nil'")
 		})
 
-		It("git_service_type - GetServiceType() bad request with no schema or host", func() {
-			err, _ := git.GetServiceType("test/test/test")
-			gomega.Expect(err.StatusCode).Should(gomega.BeEquivalentTo(http.StatusBadRequest), "git service should be equivalent to 'http.StatusBadRequest'")
+		It("Faulty url - no repository", func() {
+			serviceType, err := git.GetGitServiceType("http://github.com/test")
+			Expect(serviceType).Should(BeNil(), "service type should be 'nil'")
+			Expect(err.StatusCode).Should(BeEquivalentTo(http.StatusBadRequest), "service type should be 'nil'")
 		})
 
-		It("git_service_type - GetTyGetServiceTypepe() bad request whitespace url", func() {
-			err, _ := git.GetServiceType(" ")
-			gomega.Expect(err.StatusCode).Should(gomega.BeEquivalentTo(http.StatusBadRequest), "git service should be equivalent to 'http.StatusBadRequest'")
+		It("Correct url - non-existent", func() {
+			serviceType, err := git.GetGitServiceType("http://github.com/test/test")
+			Expect(serviceType).ShouldNot(BeNil(), "service type should be 'nil'")
+			Expect(err).Should(BeNil(), "service type should be 'nil'")
+		})
+	})
+
+	Context("Constants", func() {
+		It("Github", func() {
+			Expect(git.GITHUB).Should(BeEquivalentTo("github"), "service type should be 'nil'")
+		})
+
+		It("Unknown", func() {
+			Expect(git.UNKNOWN).Should(BeEquivalentTo("unknown"), "service type should be 'nil'")
+		})
+	})
+
+	Context("Service", func() {
+		It("Github", func() {
+			service := git.Service{}.GetGitHubService()
+			Expect(service).Should(BeEquivalentTo(&github.GitService{}), "service type should be 'nil'")
 		})
 	})
 })

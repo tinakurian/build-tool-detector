@@ -7,118 +7,172 @@ and containing scaffold outputs.
 package controllers_test
 
 import (
+	"io/ioutil"
+
 	"github.com/goadesign/goa"
 	. "github.com/onsi/ginkgo"
 	"github.com/onsi/gomega"
 	"github.com/tinakurian/build-tool-detector/app/test"
 	controllers "github.com/tinakurian/build-tool-detector/controllers"
-	"github.com/tinakurian/build-tool-detector/controllers/buildtype"
-	git "github.com/tinakurian/build-tool-detector/controllers/git"
-	"github.com/tinakurian/build-tool-detector/controllers/git/github"
 	"gopkg.in/h2non/gock.v1"
-	"io/ioutil"
-	"net/http"
 )
 
 var _ = Describe("BuildToolDetector", func() {
 	Context("Internal Server Error", func() {
-		It("Non-existent owner name -- 500 Internal Server Error", func() {
-			service := goa.New("build-tool-detector")
-			test.ShowBuildToolDetectorInternalServerError(GinkgoT(), nil, nil, controllers.NewBuildToolDetectorController(service), "https://github.com/fabric8-launcherz/launcher-backend", nil)
-		})
+		It("Non-existent owner name -- 404 Repository Not Found", func() {
+			defer gock.Off()
 
-		It("Non-existent repository name -- 500 Internal Server Error", func() {
-			service := goa.New("build-tool-detector")
-			test.ShowBuildToolDetectorInternalServerError(GinkgoT(), nil, nil, controllers.NewBuildToolDetectorController(service), "https://github.com/fabric8-launcher/launcher-backendz", nil)
-		})
+			bodyString, err := ioutil.ReadFile("../controllers/test/mock/fabric8_launcher_backend/not_found_repo_branch.json")
+			gomega.Expect(err).Should(gomega.BeNil())
 
-		It("Non-existent branch name -- 500 Internal Server Error", func() {
-			service := goa.New("build-tool-detector")
-			branch := "masterz"
-			test.ShowBuildToolDetectorInternalServerError(GinkgoT(), nil, nil, controllers.NewBuildToolDetectorController(service), "https://github.com/fabric8-launcher/launcher-backend", &branch)
-		})
+			gock.New("https://api.github.com").
+				Get("/repos/fabric8-launcherz/launcher-backend/branches/master").
+				Reply(404).
+				BodyString(string(bodyString))
 
-		It("Build tool type expected to be Unknown -- 500 Internal Server Error", func() {
 			service := goa.New("build-tool-detector")
 			branch := "master"
-			test.ShowBuildToolDetectorInternalServerError(GinkgoT(), nil, nil, controllers.NewBuildToolDetectorController(service), "https://github.com/fabric8-services/fabric8-wit", &branch)
+			test.ShowBuildToolDetectorNotFound(GinkgoT(), nil, nil, controllers.NewBuildToolDetectorController(service), "https://github.com/fabric8-launcherz/launcher-backend", &branch)
+		})
+
+		It("Non-existent owner name -- 404 Owner Not Found", func() {
+			defer gock.Off()
+
+			bodyString, err := ioutil.ReadFile("../controllers/test/mock/fabric8_launcher_backend/not_found_repo_branch.json")
+			gomega.Expect(err).Should(gomega.BeNil())
+
+			gock.New("https://api.github.com").
+				Get("/repos/fabric8-launcher/launcher-backendz/branches/master").
+				Reply(404).
+				BodyString(string(bodyString))
+
+			service := goa.New("build-tool-detector")
+			branch := "master"
+			test.ShowBuildToolDetectorNotFound(GinkgoT(), nil, nil, controllers.NewBuildToolDetectorController(service), "https://github.com/fabric8-launcher/launcher-backendz", &branch)
+		})
+
+		It("Non-existent branch name -- 404 Branch Not Found", func() {
+			defer gock.Off()
+
+			bodyString, err := ioutil.ReadFile("../controllers/test/mock/fabric8_launcher_backend/not_found_branch.json")
+			gomega.Expect(err).Should(gomega.BeNil())
+
+			gock.New("https://api.github.com").
+				Get("/repos/fabric8-launcher/launcher-backend/branches/masterz").
+				Reply(404).
+				BodyString(string(bodyString))
+
+			service := goa.New("build-tool-detector")
+			test.ShowBuildToolDetectorNotFound(GinkgoT(), nil, nil, controllers.NewBuildToolDetectorController(service), "https://github.com/fabric8-launcher/launcher-backend/tree/masterz", nil)
+		})
+
+		It("Invalid URL -- 400 Bad Request", func() {
+			service := goa.New("build-tool-detector")
+			branch := "master"
+			test.ShowBuildToolDetectorBadRequest(GinkgoT(), nil, nil, controllers.NewBuildToolDetectorController(service), "fabric8-launcher/launcher-backend", &branch)
+		})
+
+		It("Unsupported Git Service -- 500 Internal Server Error", func() {
+			service := goa.New("build-tool-detector")
+			branch := "master"
+			test.ShowBuildToolDetectorInternalServerError(GinkgoT(), nil, nil, controllers.NewBuildToolDetectorController(service), "http://gitlab.com/fabric8-launcher/launcher-backend", &branch)
+		})
+
+		It("Invalid URL and Branch -- 500 Internal Server Error", func() {
+			service := goa.New("build-tool-detector")
+			test.ShowBuildToolDetectorBadRequest(GinkgoT(), nil, nil, controllers.NewBuildToolDetectorController(service), "", nil)
 		})
 	})
 
 	Context("Okay", func() {
-		It("Okay response -- 200 Okay", func() {
-			service := goa.New("build-tool-detector")
-			branch := "master"
-			test.ShowBuildToolDetectorOK(GinkgoT(), nil, nil, controllers.NewBuildToolDetectorController(service), "https://github.com/fabric8-launcher/launcher-backend", &branch)
-		})
-
-		It("Non-nil response -- 200 Okay", func() {
-			service := goa.New("build-tool-detector")
-			branch := "master"
-			_, buildTool := test.ShowBuildToolDetectorOK(GinkgoT(), nil, nil, controllers.NewBuildToolDetectorController(service), "https://github.com/fabric8-launcher/launcher-backend", &branch)
-			gomega.Expect(buildTool).ShouldNot(gomega.BeNil(), "buildTool should not be empty")
-		})
-
-		It("Build tool type to be Maven -- 200 Okay", func() {
-			service := goa.New("build-tool-detector")
-			branch := "master"
-			_, buildTool := test.ShowBuildToolDetectorOK(GinkgoT(), nil, nil, controllers.NewBuildToolDetectorController(service), "https://github.com/fabric8-launcher/launcher-backend", &branch)
-			gomega.Expect(buildTool.BuildToolType).Should(gomega.BeEquivalentTo("maven"), "build type should be equivalent to 'maven'")
-		})
-	})
-
-	Context("build-tool-detector/controllers/buildtype", func() {
-		It("build_tool_type - Maven()", func() {
-			buildToolType := buildtype.Maven()
-			gomega.Expect(buildToolType.BuildToolType).Should(gomega.BeEquivalentTo("maven"), "build type should be equivalent to 'maven'")
-		})
-
-		It("build_tool_type - Unknown()", func() {
-			buildToolType := buildtype.Unknown()
-			gomega.Expect(buildToolType.BuildToolType).Should(gomega.BeEquivalentTo("unknown"), "build type should be equivalent to 'maven'")
-		})
-	})
-
-	Context("build-tool-detector/controllers/git/github", func() {
-		It("attributes - GetAttributes() use branch from url", func() {
-			_, gitService := git.GetServiceType("https://github.com/owner/repo/tree/branch")
-			_, attributes := github.GetAttributes(gitService.Segments, nil)
-			gomega.Expect(attributes.Owner).Should(gomega.BeEquivalentTo("owner"), "Owner field should be equivalent to 'owner'")
-			gomega.Expect(attributes.Repository).Should(gomega.BeEquivalentTo("repo"), "Repository field should be equivalent to 'repo'")
-			gomega.Expect(attributes.Branch).Should(gomega.BeEquivalentTo("branch"), "Branch field should be equivalent to 'branch'")
-
-		})
-
-		It("attributes - GetAttributes() use default branch master", func() {
-			_, gitService := git.GetServiceType("https://github.com/owner/repo")
-			_, attributes := github.GetAttributes(gitService.Segments, nil)
-			gomega.Expect(attributes.Owner).Should(gomega.BeEquivalentTo("owner"), "Owner field should be equivalent to 'owner'")
-			gomega.Expect(attributes.Repository).Should(gomega.BeEquivalentTo("repo"), "Repository field should be equivalent to 'repo'")
-			gomega.Expect(attributes.Branch).Should(gomega.BeEquivalentTo("master"), "Branch field should be equivalent to 'master'")
-		})
-
-		It("attributes - GetAttributes() not enough segments extracted from path", func() {
-			segments := []string{"test1", "test2"}
-			err, attributes := github.GetAttributes(segments, nil)
-			gomega.Expect(err.StatusCode).Should(gomega.BeEquivalentTo(http.StatusBadRequest), "invalid url segments should be equivalent to a Bad Request")
-			gomega.Expect(attributes).Should(gomega.Equal(github.Attributes{}), "invalid url segments cause empty attributes")
-		})
-	})
-
-	Context("build-tool-detector - mock Okay", func() {
-		It("attributes - GetAttributes() use branch from url", func() {
+		It("Recognize Unknown - Branch field populated", func() {
 			defer gock.Off()
-			gock.New("http://localhost:8080/build-tool-detector/build-tool").
-				Get("/https://github.com/fabric8-launcher/launcher-backend").
-				Reply(200).
-				JSON(map[string]string{"build-tool-type": "maven"})
 
-			res, err := http.Get("http://localhost:8080/build-tool-detector/build-tool/https://github.com/fabric8-launcher/launcher-backend")
+			bodyString, err := ioutil.ReadFile("../controllers/test/mock/fabric8_wit/ok_branch.json")
 			gomega.Expect(err).Should(gomega.BeNil())
-			gomega.Expect(res.StatusCode).Should(gomega.Equal(http.StatusOK))
 
-			body, _ := ioutil.ReadAll(res.Body)
-			gomega.Expect(GinkgoT(), string(body)[:13], `{"build-tool-type":"maven"}`)
+			gock.New("https://api.github.com").
+				Get("/repos/fabric8-services/fabric8-wit/branches/master").
+				Reply(200).
+				BodyString(string(bodyString))
+
+			bodyString, err = ioutil.ReadFile("../controllers/test/mock/fabric8_wit/not_found_contents.json")
+			gomega.Expect(err).Should(gomega.BeNil())
+			gock.New("https://api.github.com").
+				Get("/repos/fabric8-services/fabric8-wit/contents/pom.xml").
+				Reply(404).
+				BodyString(string(bodyString))
+			service := goa.New("build-tool-detector")
+			branch := "master"
+			_, buildTool := test.ShowBuildToolDetectorOK(GinkgoT(), nil, nil, controllers.NewBuildToolDetectorController(service), "https://github.com/fabric8-services/fabric8-wit", &branch)
+			gomega.Expect(buildTool.BuildToolType).Should(gomega.Equal("unknown"), "buildTool should not be empty")
+		})
+
+		It("Recognize Unknown - Branch included in URL", func() {
+			defer gock.Off()
+
+			bodyString, err := ioutil.ReadFile("../controllers/test/mock/fabric8_wit/ok_branch.json")
+			gomega.Expect(err).Should(gomega.BeNil())
+
+			gock.New("https://api.github.com").
+				Get("/repos/fabric8-services/fabric8-wit/branches/master").
+				Reply(200).
+				BodyString(string(bodyString))
+
+			bodyString, err = ioutil.ReadFile("../controllers/test/mock/fabric8_wit/not_found_contents.json")
+			gomega.Expect(err).Should(gomega.BeNil())
+			gock.New("https://api.github.com").
+				Get("/repos/fabric8-services/fabric8-wit/contents/pom.xml").
+				Reply(404).
+				BodyString(string(bodyString))
+			service := goa.New("build-tool-detector")
+			_, buildTool := test.ShowBuildToolDetectorOK(GinkgoT(), nil, nil, controllers.NewBuildToolDetectorController(service), "https://github.com/fabric8-services/fabric8-wit/tree/master", nil)
+			gomega.Expect(buildTool.BuildToolType).Should(gomega.Equal("unknown"), "buildTool should not be empty")
+		})
+
+		It("Recognize Maven - Branch field populated", func() {
+			defer gock.Off()
+
+			bodyString, err := ioutil.ReadFile("../controllers/test/mock/fabric8_launcher_backend/ok_branch.json")
+			gomega.Expect(err).Should(gomega.BeNil())
+
+			gock.New("https://api.github.com").
+				Get("/repos/fabric8-launcher/launcher-backend/branches/master").
+				Reply(200).
+				BodyString(string(bodyString))
+
+			bodyString, err = ioutil.ReadFile("../controllers/test/mock/fabric8_launcher_backend/ok_contents.json")
+			gomega.Expect(err).Should(gomega.BeNil())
+			gock.New("https://api.github.com").
+				Get("/repos/fabric8-launcher/launcher-backend/contents/pom.xml").
+				Reply(200).
+				BodyString(string(bodyString))
+			service := goa.New("build-tool-detector")
+			branch := "master"
+			_, buildTool := test.ShowBuildToolDetectorOK(GinkgoT(), nil, nil, controllers.NewBuildToolDetectorController(service), "https://github.com/fabric8-launcher/launcher-backend", &branch)
+			gomega.Expect(buildTool.BuildToolType).Should(gomega.Equal("maven"), "buildTool should not be empty")
+		})
+
+		It("Recognize Maven - Branch included in URL", func() {
+			defer gock.Off()
+
+			bodyString, err := ioutil.ReadFile("../controllers/test/mock/fabric8_launcher_backend/ok_branch.json")
+			gomega.Expect(err).Should(gomega.BeNil())
+
+			gock.New("https://api.github.com").
+				Get("/repos/fabric8-launcher/launcher-backend/branches/master").
+				Reply(200).
+				BodyString(string(bodyString))
+
+			bodyString, err = ioutil.ReadFile("../controllers/test/mock/fabric8_launcher_backend/ok_contents.json")
+			gomega.Expect(err).Should(gomega.BeNil())
+			gock.New("https://api.github.com").
+				Get("/repos/fabric8-launcher/launcher-backend/contents/pom.xml").
+				Reply(200).
+				BodyString(string(bodyString))
+			service := goa.New("build-tool-detector")
+			_, buildTool := test.ShowBuildToolDetectorOK(GinkgoT(), nil, nil, controllers.NewBuildToolDetectorController(service), "https://github.com/fabric8-launcher/launcher-backend/tree/master", nil)
+			gomega.Expect(buildTool.BuildToolType).Should(gomega.Equal("maven"), "buildTool should not be empty")
 		})
 	})
 })

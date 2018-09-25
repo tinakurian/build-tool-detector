@@ -18,7 +18,7 @@ import (
 	"github.com/tinakurian/build-tool-detector/controllers/buildtype"
 	errs "github.com/tinakurian/build-tool-detector/controllers/error"
 	"github.com/tinakurian/build-tool-detector/controllers/git"
-	"github.com/tinakurian/build-tool-detector/controllers/git/github"
+	"github.com/tinakurian/build-tool-detector/controllers/system"
 )
 
 // BuildToolDetectorController implements the build-tool-detector resource.
@@ -33,18 +33,18 @@ func NewBuildToolDetectorController(service *goa.Service) *BuildToolDetectorCont
 
 // Show runs the show action.
 func (c *BuildToolDetectorController) Show(ctx *app.ShowBuildToolDetectorContext) error {
-	err, gitService := git.GetServiceType(ctx.URL)
+	_, err := git.GetGitServiceType(ctx.URL)
 	if err != nil {
 		return handleRequest(ctx, err, nil)
 	}
 
-	if gitService.Service != git.GITHUB {
-		return handleRequest(ctx, nil, buildtype.Unknown())
-	}
-
-	err, buildTool := github.DetectBuildTool(ctx, gitService.Segments)
+	gitService := system.System{}.GetGitService()
+	err, buildTool := gitService.GetGitHubService().GetContents(ctx)
 	if err != nil {
-		return handleRequest(ctx, err, nil)
+		if err.StatusCode == http.StatusBadRequest {
+			return handleRequest(ctx, err, nil)
+		}
+		return handleRequest(ctx, err, buildtype.Unknown())
 	}
 
 	return handleRequest(ctx, nil, buildTool)
@@ -53,28 +53,25 @@ func (c *BuildToolDetectorController) Show(ctx *app.ShowBuildToolDetectorContext
 func handleRequest(ctx *app.ShowBuildToolDetectorContext, httpTypeError *errs.HTTPTypeError, buildTool *app.GoaBuildToolDetector) error {
 	ctx.ResponseWriter.Header().Set("Content-Type", "application/json")
 
-	if httpTypeError != nil {
-		ctx.WriteHeader(httpTypeError.StatusCode)
-		if _, err := fmt.Fprint(ctx.ResponseWriter, string(marshalJSON(httpTypeError))); err != nil {
-			panic(err)
+	if httpTypeError == nil || httpTypeError.StatusCode == http.StatusInternalServerError {
+		if buildTool != nil {
+			return ctx.OK(buildTool)
 		}
 	}
 
-	if httpTypeError == nil {
-		return ctx.OK(buildTool)
-	}
-
-	return getErrResponse(ctx, httpTypeError)
-}
-
-func marshalJSON(httpTypeError *errs.HTTPTypeError) []byte {
-
+	ctx.WriteHeader(httpTypeError.StatusCode)
 	jsonHTTPTypeError, err := json.Marshal(httpTypeError)
 	if err != nil {
+		// TODO: log and return error
 		panic(err)
 	}
 
-	return jsonHTTPTypeError
+	if _, err := fmt.Fprint(ctx.ResponseWriter, string(jsonHTTPTypeError)); err != nil {
+		// TODO: log and return error
+		panic(err)
+	}
+
+	return getErrResponse(ctx, httpTypeError)
 }
 
 func getErrResponse(ctx *app.ShowBuildToolDetectorContext, httpTypeError *errs.HTTPTypeError) error {
