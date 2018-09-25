@@ -11,7 +11,7 @@ import (
 
 	"github.com/goadesign/goa"
 	. "github.com/onsi/ginkgo"
-	"github.com/onsi/gomega"
+	. "github.com/onsi/gomega"
 	"github.com/tinakurian/build-tool-detector/app/test"
 	controllers "github.com/tinakurian/build-tool-detector/controllers"
 	"gopkg.in/h2non/gock.v1"
@@ -23,7 +23,7 @@ var _ = Describe("BuildToolDetector", func() {
 			defer gock.Off()
 
 			bodyString, err := ioutil.ReadFile("../controllers/test/mock/fabric8_launcher_backend/not_found_repo_branch.json")
-			gomega.Expect(err).Should(gomega.BeNil())
+			Expect(err).Should(BeNil())
 
 			gock.New("https://api.github.com").
 				Get("/repos/fabric8-launcherz/launcher-backend/branches/master").
@@ -39,7 +39,7 @@ var _ = Describe("BuildToolDetector", func() {
 			defer gock.Off()
 
 			bodyString, err := ioutil.ReadFile("../controllers/test/mock/fabric8_launcher_backend/not_found_repo_branch.json")
-			gomega.Expect(err).Should(gomega.BeNil())
+			Expect(err).Should(BeNil())
 
 			gock.New("https://api.github.com").
 				Get("/repos/fabric8-launcher/launcher-backendz/branches/master").
@@ -55,7 +55,7 @@ var _ = Describe("BuildToolDetector", func() {
 			defer gock.Off()
 
 			bodyString, err := ioutil.ReadFile("../controllers/test/mock/fabric8_launcher_backend/not_found_branch.json")
-			gomega.Expect(err).Should(gomega.BeNil())
+			Expect(err).Should(BeNil())
 
 			gock.New("https://api.github.com").
 				Get("/repos/fabric8-launcher/launcher-backend/branches/masterz").
@@ -89,7 +89,7 @@ var _ = Describe("BuildToolDetector", func() {
 			defer gock.Off()
 
 			bodyString, err := ioutil.ReadFile("../controllers/test/mock/fabric8_wit/ok_branch.json")
-			gomega.Expect(err).Should(gomega.BeNil())
+			Expect(err).Should(BeNil())
 
 			gock.New("https://api.github.com").
 				Get("/repos/fabric8-services/fabric8-wit/branches/master").
@@ -97,7 +97,7 @@ var _ = Describe("BuildToolDetector", func() {
 				BodyString(string(bodyString))
 
 			bodyString, err = ioutil.ReadFile("../controllers/test/mock/fabric8_wit/not_found_contents.json")
-			gomega.Expect(err).Should(gomega.BeNil())
+			Expect(err).Should(BeNil())
 			gock.New("https://api.github.com").
 				Get("/repos/fabric8-services/fabric8-wit/contents/pom.xml").
 				Reply(404).
@@ -105,14 +105,14 @@ var _ = Describe("BuildToolDetector", func() {
 			service := goa.New("build-tool-detector")
 			branch := "master"
 			_, buildTool := test.ShowBuildToolDetectorOK(GinkgoT(), nil, nil, controllers.NewBuildToolDetectorController(service), "https://github.com/fabric8-services/fabric8-wit", &branch)
-			gomega.Expect(buildTool.BuildToolType).Should(gomega.Equal("unknown"), "buildTool should not be empty")
+			Expect(buildTool.BuildToolType).Should(Equal("unknown"), "buildTool should not be empty")
 		})
 
 		It("Recognize Unknown - Branch included in URL", func() {
 			defer gock.Off()
 
 			bodyString, err := ioutil.ReadFile("../controllers/test/mock/fabric8_wit/ok_branch.json")
-			gomega.Expect(err).Should(gomega.BeNil())
+			Expect(err).Should(BeNil())
 
 			gock.New("https://api.github.com").
 				Get("/repos/fabric8-services/fabric8-wit/branches/master").
@@ -120,21 +120,21 @@ var _ = Describe("BuildToolDetector", func() {
 				BodyString(string(bodyString))
 
 			bodyString, err = ioutil.ReadFile("../controllers/test/mock/fabric8_wit/not_found_contents.json")
-			gomega.Expect(err).Should(gomega.BeNil())
+			Expect(err).Should(BeNil())
 			gock.New("https://api.github.com").
 				Get("/repos/fabric8-services/fabric8-wit/contents/pom.xml").
 				Reply(404).
 				BodyString(string(bodyString))
 			service := goa.New("build-tool-detector")
 			_, buildTool := test.ShowBuildToolDetectorOK(GinkgoT(), nil, nil, controllers.NewBuildToolDetectorController(service), "https://github.com/fabric8-services/fabric8-wit/tree/master", nil)
-			gomega.Expect(buildTool.BuildToolType).Should(gomega.Equal("unknown"), "buildTool should not be empty")
+			Expect(buildTool.BuildToolType).Should(Equal("unknown"), "buildTool should not be empty")
 		})
 
 		It("Recognize Maven - Branch field populated", func() {
 			defer gock.Off()
 
 			bodyString, err := ioutil.ReadFile("../controllers/test/mock/fabric8_launcher_backend/ok_branch.json")
-			gomega.Expect(err).Should(gomega.BeNil())
+			Expect(err).Should(BeNil())
 
 			gock.New("https://api.github.com").
 				Get("/repos/fabric8-launcher/launcher-backend/branches/master").
@@ -142,7 +142,7 @@ var _ = Describe("BuildToolDetector", func() {
 				BodyString(string(bodyString))
 
 			bodyString, err = ioutil.ReadFile("../controllers/test/mock/fabric8_launcher_backend/ok_contents.json")
-			gomega.Expect(err).Should(gomega.BeNil())
+			Expect(err).Should(BeNil())
 			gock.New("https://api.github.com").
 				Get("/repos/fabric8-launcher/launcher-backend/contents/pom.xml").
 				Reply(200).
@@ -150,14 +150,14 @@ var _ = Describe("BuildToolDetector", func() {
 			service := goa.New("build-tool-detector")
 			branch := "master"
 			_, buildTool := test.ShowBuildToolDetectorOK(GinkgoT(), nil, nil, controllers.NewBuildToolDetectorController(service), "https://github.com/fabric8-launcher/launcher-backend", &branch)
-			gomega.Expect(buildTool.BuildToolType).Should(gomega.Equal("maven"), "buildTool should not be empty")
+			Expect(buildTool.BuildToolType).Should(Equal("maven"), "buildTool should not be empty")
 		})
 
 		It("Recognize Maven - Branch included in URL", func() {
 			defer gock.Off()
 
 			bodyString, err := ioutil.ReadFile("../controllers/test/mock/fabric8_launcher_backend/ok_branch.json")
-			gomega.Expect(err).Should(gomega.BeNil())
+			Expect(err).Should(BeNil())
 
 			gock.New("https://api.github.com").
 				Get("/repos/fabric8-launcher/launcher-backend/branches/master").
@@ -165,14 +165,14 @@ var _ = Describe("BuildToolDetector", func() {
 				BodyString(string(bodyString))
 
 			bodyString, err = ioutil.ReadFile("../controllers/test/mock/fabric8_launcher_backend/ok_contents.json")
-			gomega.Expect(err).Should(gomega.BeNil())
+			Expect(err).Should(BeNil())
 			gock.New("https://api.github.com").
 				Get("/repos/fabric8-launcher/launcher-backend/contents/pom.xml").
 				Reply(200).
 				BodyString(string(bodyString))
 			service := goa.New("build-tool-detector")
 			_, buildTool := test.ShowBuildToolDetectorOK(GinkgoT(), nil, nil, controllers.NewBuildToolDetectorController(service), "https://github.com/fabric8-launcher/launcher-backend/tree/master", nil)
-			gomega.Expect(buildTool.BuildToolType).Should(gomega.Equal("maven"), "buildTool should not be empty")
+			Expect(buildTool.BuildToolType).Should(Equal("maven"), "buildTool should not be empty")
 		})
 	})
 })
