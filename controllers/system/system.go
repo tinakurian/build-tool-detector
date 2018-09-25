@@ -1,3 +1,10 @@
+/*
+
+Package system implements a way
+to retrieve different services
+for this system.
+
+*/
 package system
 
 import (

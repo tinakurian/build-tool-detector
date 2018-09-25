@@ -11,7 +11,7 @@ var _ = Describe("Service", func() {
 	Context("GetGitService", func() {
 		It("Get git service", func() {
 			gitService := System{}.GetGitService()
-			gomega.Expect(gitService).Should(gomega.BeEquivalentTo(git.Service{}), "service type should be 'nil'")
+			gomega.Expect(gitService).Should(gomega.BeEquivalentTo(git.Service{}), "service type should be git service")
 		})
 	})
 })
