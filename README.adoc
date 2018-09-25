@@ -4,6 +4,7 @@
 Little service which will detect what build tool you are using
 
 === Start hacking [[hacking]]
+Use `environment_sample.sh` as a template to create your own `environment.sh` file with the appropriate environment variable values. 
 
 Use `setup.sh` script we ship in this repository to get started right away! Simply run following `curl` command to get
 latest and the greatest setup.
