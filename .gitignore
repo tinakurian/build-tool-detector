@@ -50,3 +50,6 @@ public/
 # Binary Files
 
 bin/
+
+# setup
+environment.sh
