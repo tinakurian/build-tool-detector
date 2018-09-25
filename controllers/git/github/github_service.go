@@ -33,6 +33,7 @@ type serviceAttributes struct {
 const (
 	master = "master"
 	tree   = "tree"
+	slash  = "/"
 )
 
 var (
@@ -69,7 +70,7 @@ func (g GitService) GetContents(ctx *app.ShowBuildToolDetectorContext) (*errs.HT
 		return errs.ErrBadRequest(ErrBadRequestInvalidPath), nil
 	}
 
-	segments := strings.Split(u.Path, "/")
+	segments := strings.Split(u.Path, slash)
 	httpTypeError, attributes := getServiceAttributes(segments, ctx.Branch)
 	if httpTypeError != nil {
 		log.Printf("Error: %v", httpTypeError)
