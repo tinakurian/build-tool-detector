@@ -7,12 +7,6 @@ if [ -n "$(which sudo 2>/dev/null)" ]; then
     SUDO=sudo
 fi
 
-# Export github client id & secret
- echo -e "${CLEAR}${LIGHT_GREEN}Exporting Environment Variables"
-export GITHUB_CLIENT_ID=""
-export GITHUB_CLIENT_SECRET=""
-
-
 function install_packages() {
   echo -e "${CLEAR}${LIGHT_GREEN}Install prerequisites${CLEAR}"
 
