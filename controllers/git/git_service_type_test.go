@@ -44,11 +44,11 @@ var _ = Describe("GitServiceType", func() {
 
 	Context("Constants", func() {
 		It("Github", func() {
-			Expect(git.GITHUB).Should(BeEquivalentTo("github"), "git.GITHUB should be 'github'")
+			Expect(git.Github).Should(BeEquivalentTo("github"), "git.GITHUB should be 'github'")
 		})
 
 		It("Unknown", func() {
-			Expect(git.UNKNOWN).Should(BeEquivalentTo("unknown"), "git.UNKNOWN should be 'unknown'")
+			Expect(git.Unknown).Should(BeEquivalentTo("unknown"), "git.UNKNOWN should be 'unknown'")
 		})
 	})
 

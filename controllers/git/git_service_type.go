@@ -23,15 +23,15 @@ import (
 // supported git services.
 const (
 	// GITHUB service.
-	GITHUB = "github"
+	Github = "github"
 
 	// UNKNOWN service.
-	UNKNOWN = "unknown"
+	Unknown = "unknown"
 )
 
 const (
-	sDOTCOM = ".com"
-	sSLASH  = "/"
+	dotcom = ".com"
+	slash  = "/"
 )
 
 // Service struct
@@ -54,7 +54,7 @@ func (s Service) GetGitHubService() *github.GitService {
 // Note: This method will likely need to be enhanced
 // to handle different github url formats.
 func GetGitServiceType(urlToParse string) (*string, *errs.HTTPTypeError) {
-	gitServiceType := GITHUB
+	gitServiceType := Github
 
 	u, err := url.Parse(urlToParse)
 
@@ -64,11 +64,11 @@ func GetGitServiceType(urlToParse string) (*string, *errs.HTTPTypeError) {
 	}
 
 	// Currently only support Github
-	if u.Host != GITHUB+sDOTCOM {
+	if u.Host != Github+dotcom {
 		return nil, errs.ErrInternalServerError(github.ErrInternalServerErrorUnsupportedService)
 	}
 
-	segments := strings.Split(u.Path, sSLASH)
+	segments := strings.Split(u.Path, slash)
 	if len(segments) < 3 {
 		return nil, errs.ErrBadRequest(github.ErrInternalServerErrorUnsupportedGithubURL)
 	}
