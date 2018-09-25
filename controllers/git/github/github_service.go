@@ -22,7 +22,7 @@ import (
 	errs "github.com/tinakurian/build-tool-detector/controllers/error"
 )
 
-// Attributes used for retrieving
+// serviceAttributes used for retrieving
 // data using the go-github library.
 type serviceAttributes struct {
 	Owner      string
@@ -31,8 +31,8 @@ type serviceAttributes struct {
 }
 
 const (
-	sMASTER = "master"
-	sTREE   = "tree"
+	master = "master"
+	tree   = "tree"
 )
 
 var (
@@ -105,7 +105,7 @@ func getServiceAttributes(segments []string, ctxBranch *string) (*errs.HTTPTypeE
 	// Default branch that will be used if a branch
 	// is not passed in though the optional 'branch'
 	// query parameter and is not part of the url.
-	branch := sMASTER
+	branch := master
 
 	if len(segments) <= 2 {
 		return errs.ErrBadRequest(ErrBadRequestInvalidPath), attributes
@@ -120,7 +120,7 @@ func getServiceAttributes(segments []string, ctxBranch *string) (*errs.HTTPTypeE
 		// If the user has not specified the branch
 		// check whether it is passed in through
 		// the URL.
-		if segments[3] == sTREE {
+		if segments[3] == tree {
 			branch = segments[4]
 		}
 	}
