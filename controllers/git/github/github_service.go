@@ -156,6 +156,8 @@ func isMaven(ctx *app.ShowBuildToolDetectorContext, attributes serviceAttributes
 	if err != nil && resp.StatusCode != http.StatusOK {
 		return errs.ErrInternalServerError(ErrInternalServerErrorFailedContentRetrieval)
 	}
-
 	return nil
 }
+
+// if the org, repo and pom.xml cannot be found we see redacted&ref=master: 404 not found
+// if branch cannot be found redacted&ref=masterz: 404 no commit found for the ref masterz

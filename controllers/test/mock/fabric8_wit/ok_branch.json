@@ -1,0 +1,99 @@
+{
+    "name": "master",
+    "commit": {
+      "sha": "cd7a01bc85da4d639239e143771bdab76a64c0b0",
+      "node_id": "MDY6Q29tbWl0NTQyNjA3MDY6Y2Q3YTAxYmM4NWRhNGQ2MzkyMzllMTQzNzcxYmRhYjc2YTY0YzBiMA==",
+      "commit": {
+        "author": {
+          "name": "Konrad Kleine",
+          "email": "193408+kwk@users.noreply.github.com",
+          "date": "2018-09-25T13:38:13Z"
+        },
+        "committer": {
+          "name": "GitHub",
+          "email": "noreply@github.com",
+          "date": "2018-09-25T13:38:13Z"
+        },
+        "message": "10x the amount of allowed time for a pod to be ready (#2298)\n\nfrom 120 seconds to now 1200 seconds\r\n\r\nSee #2291",
+        "tree": {
+          "sha": "c298aa09d67c945857c020f5541720898b630103",
+          "url": "https://api.github.com/repos/fabric8-services/fabric8-wit/git/trees/c298aa09d67c945857c020f5541720898b630103"
+        },
+        "url": "https://api.github.com/repos/fabric8-services/fabric8-wit/git/commits/cd7a01bc85da4d639239e143771bdab76a64c0b0",
+        "comment_count": 0,
+        "verification": {
+          "verified": true,
+          "reason": "valid",
+          "signature": "-----BEGIN PGP SIGNATURE-----\n\nwsBcBAABCAAQBQJbqjpFCRBK7hj4Ov3rIwAAdHIIADqMw8rezI0E3mioDI+Ig7Re\nJAxHLb8tdvtOPyT9uivBahbnj7sHgN4EjDpIDjvUA2QhQHvDfc0nAJdOQyxKCCeC\nvgaeQYparSagnpLrjNsNme8n4zzbhZn3fU/mME1g3dlEedefzyEvDl9d7crAoS+i\n0Qr01eG67+jKuafFFXKqQ/pdzao/0KKxOgOc6BleohXfqCRjzuYjO0zSfUsu93gj\nW6TOCyxqg9ihe6T6ZfhVhkXWw148DFmouQf4ws050TiE8w/SLOCz3mFXALOQZl8s\ncixhtEU6K9V1hXwxu6ayQwTcdU3sl153Ylk3c+60lA1XGsnu7IKmQKtA1Zq7Xcw=\n=5mKR\n-----END PGP SIGNATURE-----\n",
+          "payload": "tree c298aa09d67c945857c020f5541720898b630103\nparent 07f931d323d4fe8a4cf6b03a60cceb1ee608393c\nauthor Konrad Kleine <193408+kwk@users.noreply.github.com> 1537882693 +0200\ncommitter GitHub <noreply@github.com> 1537882693 +0200\n\n10x the amount of allowed time for a pod to be ready (#2298)\n\nfrom 120 seconds to now 1200 seconds\r\n\r\nSee #2291"
+        }
+      },
+      "url": "https://api.github.com/repos/fabric8-services/fabric8-wit/commits/cd7a01bc85da4d639239e143771bdab76a64c0b0",
+      "html_url": "https://github.com/fabric8-services/fabric8-wit/commit/cd7a01bc85da4d639239e143771bdab76a64c0b0",
+      "comments_url": "https://api.github.com/repos/fabric8-services/fabric8-wit/commits/cd7a01bc85da4d639239e143771bdab76a64c0b0/comments",
+      "author": {
+        "login": "kwk",
+        "id": 193408,
+        "node_id": "MDQ6VXNlcjE5MzQwOA==",
+        "avatar_url": "https://avatars3.githubusercontent.com/u/193408?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/kwk",
+        "html_url": "https://github.com/kwk",
+        "followers_url": "https://api.github.com/users/kwk/followers",
+        "following_url": "https://api.github.com/users/kwk/following{/other_user}",
+        "gists_url": "https://api.github.com/users/kwk/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/kwk/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/kwk/subscriptions",
+        "organizations_url": "https://api.github.com/users/kwk/orgs",
+        "repos_url": "https://api.github.com/users/kwk/repos",
+        "events_url": "https://api.github.com/users/kwk/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/kwk/received_events",
+        "type": "User",
+        "site_admin": false
+      },
+      "committer": {
+        "login": "web-flow",
+        "id": 19864447,
+        "node_id": "MDQ6VXNlcjE5ODY0NDQ3",
+        "avatar_url": "https://avatars3.githubusercontent.com/u/19864447?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/web-flow",
+        "html_url": "https://github.com/web-flow",
+        "followers_url": "https://api.github.com/users/web-flow/followers",
+        "following_url": "https://api.github.com/users/web-flow/following{/other_user}",
+        "gists_url": "https://api.github.com/users/web-flow/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/web-flow/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/web-flow/subscriptions",
+        "organizations_url": "https://api.github.com/users/web-flow/orgs",
+        "repos_url": "https://api.github.com/users/web-flow/repos",
+        "events_url": "https://api.github.com/users/web-flow/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/web-flow/received_events",
+        "type": "User",
+        "site_admin": false
+      },
+      "parents": [
+        {
+          "sha": "07f931d323d4fe8a4cf6b03a60cceb1ee608393c",
+          "url": "https://api.github.com/repos/fabric8-services/fabric8-wit/commits/07f931d323d4fe8a4cf6b03a60cceb1ee608393c",
+          "html_url": "https://github.com/fabric8-services/fabric8-wit/commit/07f931d323d4fe8a4cf6b03a60cceb1ee608393c"
+        }
+      ]
+    },
+    "_links": {
+      "self": "https://api.github.com/repos/fabric8-services/fabric8-wit/branches/master",
+      "html": "https://github.com/fabric8-services/fabric8-wit/tree/master"
+    },
+    "protected": true,
+    "protection": {
+      "enabled": true,
+      "required_status_checks": {
+        "enforcement_level": "non_admins",
+        "contexts": [
+          "ci.centos.org PR build",
+          "alien-ike/test-keeper",
+          "ci.centos.org PR build (e2e)"
+        ]
+      }
+    },
+    "protection_url": "https://api.github.com/repos/fabric8-services/fabric8-wit/branches/master/protection"
+  }

@@ -223,6 +223,12 @@
   version = "v1.4.7"
 
 [[projects]]
+  name = "gopkg.in/h2non/gock.v1"
+  packages = ["."]
+  revision = "db9916111f9d238f7fe98f34dfde20f11142475b"
+  version = "v1.0.10"
+
+[[projects]]
   branch = "v1"
   name = "gopkg.in/tomb.v1"
   packages = ["."]
@@ -237,6 +243,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "d00c042550da7ee39b135d65f1f6957f68a064aea04a41287e2a78e13e98d656"
+  inputs-digest = "21382cbd75039c7abb03859c71029adb06aabfbb50390a96aafbdf2f172cf6d2"
   solver-name = "gps-cdcl"
   solver-version = 1

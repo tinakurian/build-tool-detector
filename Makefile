@@ -56,7 +56,7 @@ generate: clean ## (re)generates all goagen-generated files
 
 .PHONY: test
 test: build ## Executes all tests
-	@ginkgo -r
+	${BINARY_DIR}/${BINARY} & BINPID$(echo $!) @ginkgo -r kill-9 ${BINPID}
 
 .PHONY: format ## Removes unneeded imports and formats source code
 format:

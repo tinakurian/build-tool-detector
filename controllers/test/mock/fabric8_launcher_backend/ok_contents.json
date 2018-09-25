@@ -1,0 +1,18 @@
+{
+    "name": "pom.xml",
+    "path": "pom.xml",
+    "sha": "43db6a5f171fdc6f17c687467988e9f6b6a4f2d7",
+    "size": 18473,
+    "url": "https://api.github.com/repos/fabric8-launcher/launcher-backend/contents/pom.xml?ref=master",
+    "html_url": "https://github.com/fabric8-launcher/launcher-backend/blob/master/pom.xml",
+    "git_url": "https://api.github.com/repos/fabric8-launcher/launcher-backend/git/blobs/43db6a5f171fdc6f17c687467988e9f6b6a4f2d7",
+    "download_url": "https://raw.githubusercontent.com/fabric8-launcher/launcher-backend/master/pom.xml",
+    "type": "file",
+    "content": "dummy",
+    "encoding": "base64",
+    "_links": {
+        "self": "https://api.github.com/repos/fabric8-launcher/launcher-backend/contents/pom.xml?ref=master",
+        "git": "https://api.github.com/repos/fabric8-launcher/launcher-backend/git/blobs/43db6a5f171fdc6f17c687467988e9f6b6a4f2d7",
+        "html": "https://github.com/fabric8-launcher/launcher-backend/blob/master/pom.xml"
+    }
+}
