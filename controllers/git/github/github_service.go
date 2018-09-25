@@ -16,11 +16,12 @@ import (
 	"net/url"
 	"strings"
 
+	"os"
+
 	"github.com/google/go-github/github"
 	"github.com/tinakurian/build-tool-detector/app"
 	"github.com/tinakurian/build-tool-detector/controllers/buildtype"
 	errs "github.com/tinakurian/build-tool-detector/controllers/error"
-	"os"
 )
 
 // serviceAttributes used for retrieving
