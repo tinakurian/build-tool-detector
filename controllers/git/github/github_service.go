@@ -36,6 +36,7 @@ const (
 	master = "master"
 	tree   = "tree"
 	slash  = "/"
+	pom    = "pom.xml"
 )
 
 var (
@@ -139,12 +140,20 @@ func getServiceAttributes(segments []string, ctxBranch *string) (*errs.HTTPTypeE
 
 func isMaven(ctx *app.ShowBuildToolDetectorContext, attributes serviceAttributes) *errs.HTTPTypeError {
 
+	// Get the github client id and github client
+	// secret if set to get better rate limits.
 	t := github.UnauthenticatedRateLimitedTransport{
 		ClientID:     os.Getenv("GITHUB_CLIENT_ID"),
 		ClientSecret: os.Getenv("GITHUB_CLIENT_SECRET"),
 	}
 
+	// If the github client id or github client
+	// secret are empty, we will default to using
+	// the github client with minimal rate limits.
 	client := github.NewClient(t.Client())
+	if t.ClientID == "" || t.ClientSecret == "" {
+		client = github.NewClient(nil)
+	}
 
 	// Check that the repository + branch exists first.
 	_, _, err := client.Repositories.GetBranch(ctx, attributes.Owner, attributes.Repository, attributes.Branch)
@@ -156,7 +165,7 @@ func isMaven(ctx *app.ShowBuildToolDetectorContext, attributes serviceAttributes
 	_, _, resp, err := client.Repositories.GetContents(
 		ctx, attributes.Owner,
 		attributes.Repository,
-		"pom.xml",
+		pom,
 		&github.RepositoryContentGetOptions{Ref: attributes.Branch})
 	if err != nil && resp.StatusCode != http.StatusOK {
 		return errs.ErrInternalServerError(ErrInternalServerErrorFailedContentRetrieval)
