@@ -14,9 +14,8 @@ import (
 	"log"
 	"net/http"
 	"net/url"
-	"strings"
-
 	"os"
+	"strings"
 
 	"github.com/google/go-github/github"
 	"github.com/tinakurian/build-tool-detector/app"

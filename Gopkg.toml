@@ -58,7 +58,14 @@ required = [
   name = "github.com/onsi/ginkgo"
   version = "1.6.0"
 
-  	
+[[constraint]]
+  name = "github.com/sirupsen/logrus"
+  version = "1.1.0"
+
+[[constraint]]
+  name = "github.com/evalphobia/logrus_sentry"
+  version = "0.4.6"
+  
 # Apply workaround from https://github.com/golang/dep/issues/1799
 [[override]]
   name = "gopkg.in/fsnotify.v1"

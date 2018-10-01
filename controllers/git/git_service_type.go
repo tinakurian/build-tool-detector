@@ -17,6 +17,7 @@ import (
 
 	errs "github.com/tinakurian/build-tool-detector/controllers/error"
 	"github.com/tinakurian/build-tool-detector/controllers/git/github"
+	logorus "github.com/tinakurian/build-tool-detector/log"
 )
 
 // constants to define the different
@@ -60,6 +61,10 @@ func GetGitServiceType(urlToParse string) (*string, *errs.HTTPTypeError) {
 
 	// Fail on error or empty host or empty scheme.
 	if err != nil || u.Host == "" || u.Scheme == "" {
+		logorus.Logger().
+			WithError(github.ErrBadRequestInvalidPath).
+			WithField("URL", u).
+			Errorf(github.ErrBadRequestInvalidPath.Error())
 		return nil, errs.ErrBadRequest(github.ErrBadRequestInvalidPath)
 	}
 

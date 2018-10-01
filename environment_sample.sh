@@ -19,3 +19,6 @@ export GITHUB_CLIENT_ID=""
 
 # Export github client secret
 export GITHUB_CLIENT_SECRET=""
+
+# Export sentry dsn
+export SENTRY_DSN=""

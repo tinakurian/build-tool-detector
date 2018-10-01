@@ -19,6 +19,7 @@ import (
 	errs "github.com/tinakurian/build-tool-detector/controllers/error"
 	"github.com/tinakurian/build-tool-detector/controllers/git"
 	"github.com/tinakurian/build-tool-detector/controllers/system"
+	logorus "github.com/tinakurian/build-tool-detector/log"
 )
 
 // BuildToolDetectorController implements the build-tool-detector resource.
@@ -52,7 +53,6 @@ func (c *BuildToolDetectorController) Show(ctx *app.ShowBuildToolDetectorContext
 
 func handleRequest(ctx *app.ShowBuildToolDetectorContext, httpTypeError *errs.HTTPTypeError, buildTool *app.GoaBuildToolDetector) error {
 	ctx.ResponseWriter.Header().Set("Content-Type", "application/json")
-
 	if httpTypeError == nil || httpTypeError.StatusCode == http.StatusInternalServerError {
 		if buildTool != nil {
 			return ctx.OK(buildTool)
@@ -62,13 +62,11 @@ func handleRequest(ctx *app.ShowBuildToolDetectorContext, httpTypeError *errs.HT
 	ctx.WriteHeader(httpTypeError.StatusCode)
 	jsonHTTPTypeError, err := json.Marshal(httpTypeError)
 	if err != nil {
-		// TODO: log and return error
-		panic(err)
+		logorus.Logger().WithError(err).WithField("error", httpTypeError).Errorf("unable to marshal json")
 	}
 
 	if _, err := fmt.Fprint(ctx.ResponseWriter, string(jsonHTTPTypeError)); err != nil {
-		// TODO: log and return error
-		panic(err)
+		logorus.Logger().WithError(err).WithField("error", jsonHTTPTypeError).Errorf("unable to propagate error")
 	}
 
 	return getErrResponse(ctx, httpTypeError)
