@@ -31,8 +31,10 @@ const (
 )
 
 const (
-	dotcom = ".com"
-	slash  = "/"
+	dotcom   = ".com"
+	slash    = "/"
+	segments = "url segments"
+	host     = "host"
 )
 
 // Service struct.
@@ -63,18 +65,26 @@ func GetGitServiceType(urlToParse string) (*string, *errs.HTTPTypeError) {
 	if err != nil || u.Host == "" || u.Scheme == "" {
 		logorus.Logger().
 			WithError(github.ErrBadRequestInvalidPath).
-			WithField("URL", u).
-			Errorf(github.ErrBadRequestInvalidPath.Error())
+			WithField(segments, u).
+			Warningf(github.ErrBadRequestInvalidPath.Error())
 		return nil, errs.ErrBadRequest(github.ErrBadRequestInvalidPath)
 	}
 
 	// Currently only support Github.
 	if u.Host != Github+dotcom {
+		logorus.Logger().
+			WithError(github.ErrBadRequestInvalidPath).
+			WithField(host, u.Host).
+			Warningf(github.ErrInternalServerErrorUnsupportedService.Error())
 		return nil, errs.ErrInternalServerError(github.ErrInternalServerErrorUnsupportedService)
 	}
 
-	segments := strings.Split(u.Path, slash)
-	if len(segments) < 3 {
+	urlSegments := strings.Split(u.Path, slash)
+	if len(urlSegments) < 3 {
+		logorus.Logger().
+			WithError(github.ErrBadRequestInvalidPath).
+			WithField(segments, urlSegments).
+			Warningf(github.ErrInternalServerErrorUnsupportedGithubURL.Error())
 		return nil, errs.ErrBadRequest(github.ErrInternalServerErrorUnsupportedGithubURL)
 	}
 
