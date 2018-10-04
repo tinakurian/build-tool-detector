@@ -52,6 +52,7 @@ func (c *BuildToolDetectorController) Show(ctx *app.ShowBuildToolDetectorContext
 	return handleRequest(ctx, nil, buildToolType)
 }
 
+// handleRequest handles returning the correct goa context as well as the GoaBuildToolDetector response
 func handleRequest(ctx *app.ShowBuildToolDetectorContext, httpTypeError *errs.HTTPTypeError, buildToolType *string) error {
 	ctx.ResponseWriter.Header().Set("Content-Type", "application/json")
 	if (httpTypeError == nil || httpTypeError.StatusCode == http.StatusInternalServerError) && buildToolType != nil {
@@ -77,6 +78,7 @@ func handleRequest(ctx *app.ShowBuildToolDetectorContext, httpTypeError *errs.HT
 	return getErrResponse(ctx, httpTypeError)
 }
 
+// getErrResponse will determine the correct goa error response
 func getErrResponse(ctx *app.ShowBuildToolDetectorContext, httpTypeError *errs.HTTPTypeError) error {
 	var response error
 	switch httpTypeError.StatusCode {
