@@ -12,12 +12,12 @@ maven.
 package git
 
 import (
-	"net/url"
-	"strings"
-
+	"fmt"
 	errs "github.com/tinakurian/build-tool-detector/controllers/error"
 	"github.com/tinakurian/build-tool-detector/controllers/git/github"
 	logorus "github.com/tinakurian/build-tool-detector/log"
+	"net/url"
+	"strings"
 )
 
 // constants to define the different
