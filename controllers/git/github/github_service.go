@@ -32,15 +32,14 @@ type requestAttributes struct {
 }
 
 const (
-	master             = "master"
-	tree               = "tree"
-	slash              = "/"
-	pom                = "pom.xml"
-	segments           = "segments"
-	branch             = "branch"
-	attributes         = "attributes"
-	githubClientID     = "GITHUB_CLIENT_ID"
-	githubClientSecret = "GITHUB_CLIENT_SECRET"
+	master     = "master"
+	tree       = "tree"
+	slash      = "/"
+	pom        = "pom.xml"
+	segments   = "segments"
+	branch     = "branch"
+	attributes = "attributes"
+	rawURL     = "url"
 )
 
 var (
@@ -77,6 +76,10 @@ func (g GitService) GetContents(ctx *app.ShowBuildToolDetectorContext) (*errs.HT
 	// will print the error to the user.
 	u, err := url.Parse(ctx.URL)
 	if err != nil {
+		logorus.Logger().
+			WithError(err).
+			WithField(rawURL, ctx.URL).
+			Warningf(ErrBadRequestInvalidPath.Error())
 		return errs.ErrBadRequest(ErrBadRequestInvalidPath), nil
 	}
 
@@ -158,8 +161,8 @@ func isMaven(ctx *app.ShowBuildToolDetectorContext, requestAttrs requestAttribut
 	// Get the github client id and github client
 	// secret if set to get better rate limits.
 	t := github.UnauthenticatedRateLimitedTransport{
-		ClientID:     os.Getenv(githubClientID),
-		ClientSecret: os.Getenv(githubClientSecret),
+		ClientID:     os.Getenv("GITHUB_CLIENT_ID"),
+		ClientSecret: os.Getenv("GITHUB_CLIENT_SECRET"),
 	}
 
 	// If the github client id or github client

@@ -13,7 +13,7 @@ func Logger() *logrus.Entry {
 	logrus.SetFormatter(&logrus.JSONFormatter{})
 	logrus.SetLevel(logrus.WarnLevel)
 
-	// TODO: have env vairable to specify we are running tests which
+	// TODO: have env variable to specify we are running tests which
 	// will return a different logger.
 	sentryDSN := os.Getenv("SENTRY_DSN")
 
