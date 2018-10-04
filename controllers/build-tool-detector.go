@@ -66,10 +66,12 @@ func handleRequest(ctx *app.ShowBuildToolDetectorContext, httpTypeError *errs.HT
 	jsonHTTPTypeError, err := json.Marshal(httpTypeError)
 	if err != nil {
 		logorus.Logger().WithError(err).WithField("error", httpTypeError).Errorf("unable to marshal json")
+		return ctx.InternalServerError()
 	}
 
 	if _, err := fmt.Fprint(ctx.ResponseWriter, string(jsonHTTPTypeError)); err != nil {
 		logorus.Logger().WithError(err).WithField("error", jsonHTTPTypeError).Errorf("unable to propagate error")
+		return ctx.InternalServerError()
 	}
 
 	return getErrResponse(ctx, httpTypeError)
