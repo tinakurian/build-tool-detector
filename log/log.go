@@ -23,6 +23,7 @@ func Logger() *logrus.Entry {
 			logrus.FatalLevel,
 			logrus.ErrorLevel,
 			logrus.WarnLevel,
+			logrus.InfoLevel,
 		})
 
 		if err != nil {
