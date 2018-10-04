@@ -12,7 +12,6 @@ maven.
 package git
 
 import (
-	"fmt"
 	errs "github.com/tinakurian/build-tool-detector/controllers/error"
 	"github.com/tinakurian/build-tool-detector/controllers/git/github"
 	logorus "github.com/tinakurian/build-tool-detector/log"
