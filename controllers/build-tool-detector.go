@@ -34,29 +34,32 @@ func NewBuildToolDetectorController(service *goa.Service) *BuildToolDetectorCont
 
 // Show runs the show action.
 func (c *BuildToolDetectorController) Show(ctx *app.ShowBuildToolDetectorContext) error {
-	_, err := git.GetGitServiceType(ctx.URL)
+	rawURL := ctx.URL
+	_, err := git.GetGitServiceType(rawURL)
 	if err != nil {
 		return handleRequest(ctx, err, nil)
 	}
 
 	gitService := system.System{}.GetGitService()
-	err, buildTool := gitService.GetGitHubService().GetContents(ctx)
+	err, buildToolType := gitService.GetGitHubService().GetContents(ctx.Context, rawURL, ctx.Branch)
 	if err != nil {
 		if err.StatusCode == http.StatusBadRequest {
 			return handleRequest(ctx, err, nil)
 		}
-		return handleRequest(ctx, err, buildtype.Unknown())
+		return handleRequest(ctx, err, buildToolType)
 	}
 
-	return handleRequest(ctx, nil, buildTool)
+	return handleRequest(ctx, nil, buildToolType)
 }
 
-func handleRequest(ctx *app.ShowBuildToolDetectorContext, httpTypeError *errs.HTTPTypeError, buildTool *app.GoaBuildToolDetector) error {
+func handleRequest(ctx *app.ShowBuildToolDetectorContext, httpTypeError *errs.HTTPTypeError, buildToolType *string) error {
 	ctx.ResponseWriter.Header().Set("Content-Type", "application/json")
-	if httpTypeError == nil || httpTypeError.StatusCode == http.StatusInternalServerError {
-		if buildTool != nil {
-			return ctx.OK(buildTool)
+	if (httpTypeError == nil || httpTypeError.StatusCode == http.StatusInternalServerError) && buildToolType != nil {
+		buildTool := buildtype.Unknown()
+		if buildtype.MAVEN == *buildToolType {
+			buildTool = buildtype.Maven()
 		}
+		return ctx.OK(buildTool)
 	}
 
 	ctx.WriteHeader(httpTypeError.StatusCode)

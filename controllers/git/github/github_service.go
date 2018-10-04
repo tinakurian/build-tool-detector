@@ -10,14 +10,14 @@ build using maven.
 package github
 
 import (
+	"context"
 	"errors"
 	"net/http"
-	"net/url"
+	netURL "net/url"
 	"os"
 	"strings"
 
 	"github.com/google/go-github/github"
-	"github.com/tinakurian/build-tool-detector/app"
 	"github.com/tinakurian/build-tool-detector/controllers/buildtype"
 	errs "github.com/tinakurian/build-tool-detector/controllers/error"
 	logorus "github.com/tinakurian/build-tool-detector/log"
@@ -39,7 +39,7 @@ const (
 	segments   = "segments"
 	branch     = "branch"
 	attributes = "attributes"
-	rawURL     = "url"
+	url        = "url"
 )
 
 var (
@@ -64,31 +64,31 @@ var (
 
 // IGitService git service interface.
 type IGitService interface {
-	GetContents(ctx *app.ShowBuildToolDetectorContext) (*errs.HTTPTypeError, *app.GoaBuildToolDetector)
+	GetContents(ctx context.Context) (*errs.HTTPTypeError, *string)
 }
 
 // GitService struct.
 type GitService struct{}
 
 // GetContents gets the contents for the service.
-func (g GitService) GetContents(ctx *app.ShowBuildToolDetectorContext) (*errs.HTTPTypeError, *app.GoaBuildToolDetector) {
+func (g GitService) GetContents(ctx context.Context, rawURL string, branchName *string) (*errs.HTTPTypeError, *string) {
 	// GetAttributes returns a BadRequest error and
 	// will print the error to the user.
-	u, err := url.Parse(ctx.URL)
+	u, err := netURL.Parse(rawURL)
 	if err != nil {
 		logorus.Logger().
 			WithError(err).
-			WithField(rawURL, ctx.URL).
+			WithField(url, rawURL).
 			Warningf(ErrBadRequestInvalidPath.Error())
 		return errs.ErrBadRequest(ErrBadRequestInvalidPath), nil
 	}
 
 	urlSegments := strings.Split(u.Path, slash)
-	httpTypeError, serviceAttribute := getServiceAttributes(urlSegments, ctx.Branch)
+	httpTypeError, serviceAttribute := getServiceAttributes(urlSegments, branchName)
 	if httpTypeError != nil {
 		logorus.Logger().
 			WithField(segments, urlSegments).
-			WithField(branch, ctx.Branch).
+			WithField(branch, branchName).
 			Warningf(httpTypeError.Error)
 		return httpTypeError, nil
 	}
@@ -96,20 +96,20 @@ func (g GitService) GetContents(ctx *app.ShowBuildToolDetectorContext) (*errs.HT
 	// getGithubRepositoryPom returns an
 	// InternalServerError and will print
 	// the buildTool as unknown.
-	buildTool := buildtype.Unknown()
+	buildTool := buildtype.UNKNOWN
 	httpTypeError = isMaven(ctx, serviceAttribute)
 	if httpTypeError != nil {
 		logorus.Logger().
 			WithField(attributes, serviceAttribute).
 			Warningf(httpTypeError.Error)
-		return httpTypeError, buildTool
+		return httpTypeError, &buildTool
 	}
 
 	// Reset the buildToolType to maven since
 	// the pom.xml was retrievable.
-	buildTool.BuildToolType = buildtype.MAVEN
+	buildTool = buildtype.MAVEN
 
-	return nil, buildTool
+	return nil, &buildTool
 }
 
 // getServiceAttributes will use the path segments and
@@ -156,7 +156,7 @@ func getServiceAttributes(segments []string, ctxBranch *string) (*errs.HTTPTypeE
 	return nil, requestAttrs
 }
 
-func isMaven(ctx *app.ShowBuildToolDetectorContext, requestAttrs requestAttributes) *errs.HTTPTypeError {
+func isMaven(ctx context.Context, requestAttrs requestAttributes) *errs.HTTPTypeError {
 
 	// Get the github client id and github client
 	// secret if set to get better rate limits.
