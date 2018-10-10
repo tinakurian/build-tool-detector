@@ -3,6 +3,7 @@
 package main
 
 import (
+	"errors"
 	"flag"
 	"os"
 
@@ -10,14 +11,29 @@ import (
 	"github.com/goadesign/goa/middleware"
 	"github.com/tinakurian/build-tool-detector/app"
 	controllers "github.com/tinakurian/build-tool-detector/controllers"
+	"github.com/tinakurian/build-tool-detector/controllers/git/github"
+	"github.com/tinakurian/build-tool-detector/log"
 	logorus "github.com/tinakurian/build-tool-detector/log"
 )
 
 var (
-	port           = flag.String("PORT", "8080", "port")
-	ghClientID     = flag.String("GH_CLIENT_ID", "", "Github Client ID")
-	ghClientSecret = flag.String("GH_CLIENT_SECRET", "", "Github Client Secret")
-	sentryDSN      = flag.String("SENTRY_DSN", "", "Sentry DSN")
+	// errFatalFailedSettingSentryDSN failed to set sentry env var
+	errFatalFailedSettingSentryDSN = errors.New("failed to set environment variable for SENTRY_DSN: ")
+)
+
+const (
+	startup           = "startup"
+	errorz            = "err"
+	buildToolDetector = "build-tool-detector"
+	port              = "port"
+	defaultPort       = "8080"
+)
+
+var (
+	portNumber     = flag.String(port, defaultPort, "port")
+	ghClientID     = flag.String(github.ClientID, "", "Github Client ID")
+	ghClientSecret = flag.String(github.ClientSecret, "", "Github Client Secret")
+	sentryDSN      = flag.String(log.SentryDSN, "", "Sentry DSN")
 )
 
 func main() {
@@ -25,21 +41,21 @@ func main() {
 	flag.Parse()
 	if *ghClientID == "" || *ghClientSecret == "" {
 		logorus.Logger().
-			WithField("GH_CLIENT_ID", ghClientID).
-			WithField("GH_CLIENT_SECRET", ghClientSecret).
-			Fatalf("cannot run application without GH_CLIENT_ID and GH_CLIENT_SECRET")
+			WithField(github.ClientID, ghClientID).
+			WithField(github.ClientSecret, ghClientSecret).
+			Fatalf(github.ErrFatalMissingGHAttributes.Error())
 	}
 
 	// Export Sentry DSN for logging
-	err := os.Setenv("BUILD_TOOL_DETECTOR_SENTRY_DSN", *sentryDSN)
+	err := os.Setenv(log.BuildToolDetectorSentryDSN, *sentryDSN)
 	if err != nil {
 		logorus.Logger().
-			WithField("SENTRY_DSN", sentryDSN).
-			Fatalf("failed to set environment variable for SENTRY_DSN: %v", sentryDSN)
+			WithField(log.SentryDSN, sentryDSN).
+			Fatalf(errFatalFailedSettingSentryDSN.Error()+"%v", sentryDSN)
 	}
 
 	// Create service
-	service := goa.New("build-tool-detector")
+	service := goa.New(buildToolDetector)
 
 	// Mount middleware
 	service.Use(middleware.RequestID())
@@ -55,7 +71,7 @@ func main() {
 	app.MountSwaggerController(service, cs)
 
 	// Start service
-	if err := service.ListenAndServe(":" + *port); err != nil {
-		service.LogError("startup", "err", err)
+	if err := service.ListenAndServe(":" + *portNumber); err != nil {
+		service.LogError(startup, errorz, err)
 	}
 }

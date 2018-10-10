@@ -31,12 +31,17 @@ type requestAttributes struct {
 }
 
 const (
-	master         = "master"
-	tree           = "tree"
-	slash          = "/"
-	pom            = "pom.xml"
-	ghClientID     = "ghClientID"
-	ghClientSecret = "ghClientSecret"
+	// ClientID github client id
+	ClientID = "GH_CLIENT_ID"
+
+	// ClientSecret github client secret
+	ClientSecret = "GH_CLIENT_SECRET"
+)
+const (
+	master = "master"
+	tree   = "tree"
+	slash  = "/"
+	pom    = "pom.xml"
 )
 
 var (
@@ -55,8 +60,8 @@ var (
 	// ErrNotFoundResource no resource found.
 	ErrNotFoundResource = errors.New("resource not found")
 
-	// ErrFatalLimitedRateLimits github client id and github client secret are unavailable
-	ErrFatalLimitedRateLimits = errors.New("github client id and github client secret are unavailable")
+	// ErrFatalMissingGHAttributes github client id and github client secret are unavailable
+	ErrFatalMissingGHAttributes = errors.New("github client id and github client secret are unavailable")
 )
 
 // IGitService git service interface.
@@ -156,9 +161,9 @@ func isMaven(ctx context.Context, ghService GitService, requestAttrs requestAttr
 	client := github.NewClient(t.Client())
 	if t.ClientID == "" || t.ClientSecret == "" {
 		logorus.Logger().
-			WithField(ghClientID, t.ClientID).
-			WithField(ghClientSecret, t.ClientSecret).
-			Fatalf(ErrFatalLimitedRateLimits.Error())
+			WithField(ClientID, t.ClientID).
+			WithField(ClientSecret, t.ClientSecret).
+			Fatalf(ErrFatalMissingGHAttributes.Error())
 	}
 
 	// Check that the repository + branch exists first.

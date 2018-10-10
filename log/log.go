@@ -7,6 +7,19 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+const (
+	// BuildToolDetectorSentryDSN env var for sentry dsn
+	BuildToolDetectorSentryDSN = "BUILD_TOOL_DETECTOR_SENTRY_DSN"
+
+	// SentryDSN for sentry
+	SentryDSN = "SENTRY_DSN"
+)
+
+const (
+	buildToolDetector = "build-tool-detector"
+	applicationName   = "applicationName"
+)
+
 // Logger something
 func Logger() *logrus.Entry {
 
@@ -15,7 +28,7 @@ func Logger() *logrus.Entry {
 
 	// TODO: have env variable to specify we are running tests which
 	// will return a different logger.
-	sentryDSN := os.Getenv("BUILD_TOOL_DETECTOR_SENTRY_DSN")
+	sentryDSN := os.Getenv(BuildToolDetectorSentryDSN)
 	if sentryDSN != "" {
 		hook, err := logrus_sentry.NewSentryHook(sentryDSN, []logrus.Level{
 			logrus.PanicLevel,
@@ -33,5 +46,5 @@ func Logger() *logrus.Entry {
 	} else {
 		logrus.SetOutput(os.Stdout)
 	}
-	return logrus.WithField("applicationName", "build-tool-detector")
+	return logrus.WithField(applicationName, buildToolDetector)
 }
