@@ -75,45 +75,34 @@ type GitService struct {
 }
 
 // GetContents gets the contents for the service.
-func (g GitService) GetContents(ctx context.Context, rawURL string, branchName *string) (*errs.HTTPTypeError, *string) {
+func (g GitService) GetContents(ctx context.Context, rawURL string, branchName *string) (*string, *errs.HTTPTypeError) {
 	// GetAttributes returns a BadRequest error and
 	// will print the error to the user.
 	u, err := netURL.Parse(rawURL)
 	if err != nil {
-		logorus.Logger().
-			WithError(err).
-			WithField(url, rawURL).
-			Warningf(ErrBadRequestInvalidPath.Error())
-		return errs.ErrBadRequest(ErrBadRequestInvalidPath), nil
+		return nil, errs.ErrBadRequest(ErrBadRequestInvalidPath)
 	}
 
 	urlSegments := strings.Split(u.Path, slash)
-	httpTypeError, serviceAttribute := getServiceAttributes(urlSegments, branchName)
+	serviceAttribute, httpTypeError := getServiceAttributes(urlSegments, branchName)
 	if httpTypeError != nil {
-		logorus.Logger().
-			WithField(segments, urlSegments).
-			WithField(branch, branchName).
-			Warningf(httpTypeError.Error)
-		return httpTypeError, nil
+		return nil, httpTypeError
 	}
 
 	// getGithubRepositoryPom returns an
 	// InternalServerError and will print
 	// the buildTool as unknown.
 	buildTool := buildtype.UNKNOWN
-	httpTypeError = isMaven(ctx, g, serviceAttribute)
+	_, httpTypeError = isMaven(ctx, g, serviceAttribute)
 	if httpTypeError != nil {
-		logorus.Logger().
-			WithField(attributes, serviceAttribute).
-			Warningf(httpTypeError.Error)
-		return httpTypeError, &buildTool
+		return &buildTool, httpTypeError
 	}
 
 	// Reset the buildToolType to maven since
 	// the pom.xml was retrievable.
 	buildTool = buildtype.MAVEN
 
-	return nil, &buildTool
+	return &buildTool, nil
 }
 
 // getServiceAttributes will use the path segments and
@@ -121,7 +110,7 @@ func (g GitService) GetContents(ctx context.Context, rawURL string, branchName *
 // struct. The attributes struct will be used
 // to make a request to github to determine
 // the build tool type.
-func getServiceAttributes(segments []string, ctxBranch *string) (*errs.HTTPTypeError, requestAttributes) {
+func getServiceAttributes(segments []string, ctxBranch *string) (requestAttributes, *errs.HTTPTypeError) {
 
 	var requestAttrs requestAttributes
 
@@ -131,7 +120,7 @@ func getServiceAttributes(segments []string, ctxBranch *string) (*errs.HTTPTypeE
 	branch := master
 
 	if len(segments) <= 2 {
-		return errs.ErrBadRequest(ErrBadRequestInvalidPath), requestAttrs
+		return requestAttrs, errs.ErrBadRequest(ErrBadRequestInvalidPath)
 	}
 
 	// If the query parameter field 'branch' is not
@@ -154,10 +143,10 @@ func getServiceAttributes(segments []string, ctxBranch *string) (*errs.HTTPTypeE
 		Branch:     branch,
 	}
 
-	return nil, requestAttrs
+	return requestAttrs, nil
 }
 
-func isMaven(ctx context.Context, ghService GitService, requestAttrs requestAttributes) *errs.HTTPTypeError {
+func isMaven(ctx context.Context, ghService GitService, requestAttrs requestAttributes) (bool, *errs.HTTPTypeError) {
 
 	// Get the github client id and github client
 	// secret if set to get better rate limits.
@@ -179,7 +168,7 @@ func isMaven(ctx context.Context, ghService GitService, requestAttrs requestAttr
 	// Check that the repository + branch exists first.
 	_, _, err := client.Repositories.GetBranch(ctx, requestAttrs.Owner, requestAttrs.Repository, requestAttrs.Branch)
 	if err != nil {
-		return errs.ErrNotFoundError(ErrNotFoundResource)
+		return false, errs.ErrNotFoundError(ErrNotFoundResource)
 	}
 
 	// If the repository and branch exists, get the contents for the repository.
@@ -189,7 +178,7 @@ func isMaven(ctx context.Context, ghService GitService, requestAttrs requestAttr
 		pom,
 		&github.RepositoryContentGetOptions{Ref: requestAttrs.Branch})
 	if err != nil && resp.StatusCode != http.StatusOK {
-		return errs.ErrInternalServerError(ErrInternalServerErrorFailedContentRetrieval)
+		return false, errs.ErrInternalServerError(ErrInternalServerErrorFailedContentRetrieval)
 	}
-	return nil
+	return true, nil
 }

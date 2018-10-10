@@ -59,7 +59,7 @@ func (c *BuildToolDetectorController) Show(ctx *app.ShowBuildToolDetectorContext
 	}
 
 	gitService := system.System{}.GetGitService()
-	err, buildToolType := gitService.GetGitHubService(c.ghClientID, c.ghClientSecret).GetContents(ctx.Context, rawURL, ctx.Branch)
+	buildToolType, err := gitService.GetGitHubService(c.ghClientID, c.ghClientSecret).GetContents(ctx.Context, rawURL, ctx.Branch)
 	if err != nil {
 		if err.StatusCode == http.StatusBadRequest {
 			return handleRequest(ctx, err, nil)
