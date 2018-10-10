@@ -4,12 +4,13 @@ package main
 
 import (
 	"flag"
+	"os"
+
 	"github.com/goadesign/goa"
 	"github.com/goadesign/goa/middleware"
 	"github.com/tinakurian/build-tool-detector/app"
 	controllers "github.com/tinakurian/build-tool-detector/controllers"
 	logorus "github.com/tinakurian/build-tool-detector/log"
-	"os"
 )
 
 var (
@@ -24,17 +25,17 @@ func main() {
 	flag.Parse()
 	if *ghClientID == "" || *ghClientSecret == "" {
 		logorus.Logger().
-			WithField("ghClientID", ghClientID).
-			WithField("ghClientSecret", ghClientSecret).
-			Fatalf("Cannot run application without ghClientID and ghClientSecret")
+			WithField("GH_CLIENT_ID", ghClientID).
+			WithField("GH_CLIENT_SECRET", ghClientSecret).
+			Fatalf("Cannot run application without GH_CLIENT_ID and GH_CLIENT_SECRET")
 	}
 
 	// Export Sentry DSN for logging
 	err := os.Setenv("BUILD_TOOL_DETECTOR_SENTRY_DSN", *sentryDSN)
 	if err != nil {
 		logorus.Logger().
-			WithField("sentryDSN", sentryDSN).
-			Fatalf("Failed to set environment variable for sentryDSN: %v", sentryDSN)
+			WithField("SENTRY_DSN", sentryDSN).
+			Fatalf("Failed to set environment variable for SENTRY_DSN: %v", sentryDSN)
 	}
 
 	// Create service
