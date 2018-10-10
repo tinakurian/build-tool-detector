@@ -69,7 +69,7 @@ check: ## Concurrently runs a whole bunch of static analysis tools
 
 .PHONY: run
 run: ## runs the service locally
-	port=8080
+	PORT=8080
 	${BINARY_DIR}/${BINARY} -PORT=$(PORT) -GH_CLIENT_ID=$(GH_CLIENT_ID) -GH_CLIENT_SECRET=$(GH_CLIENT_SECRET) -SENTRY_DSN=$(SENTRY_DSN)
 
 .PHONY: tools

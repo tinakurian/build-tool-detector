@@ -25,7 +25,7 @@ const (
 	startup           = "startup"
 	errorz            = "err"
 	buildToolDetector = "build-tool-detector"
-	port              = "port"
+	port              = "PORT"
 	defaultPort       = "8080"
 )
 
