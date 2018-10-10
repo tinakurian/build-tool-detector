@@ -13,7 +13,7 @@ import (
 	"context"
 	"errors"
 	"net/http"
-	netURL "net/url"
+	"net/url"
 	"strings"
 
 	"github.com/google/go-github/github"
@@ -35,10 +35,6 @@ const (
 	tree           = "tree"
 	slash          = "/"
 	pom            = "pom.xml"
-	segments       = "segments"
-	branch         = "branch"
-	attributes     = "attributes"
-	url            = "url"
 	ghClientID     = "ghClientID"
 	ghClientSecret = "ghClientSecret"
 )
@@ -59,8 +55,8 @@ var (
 	// ErrNotFoundResource no resource found.
 	ErrNotFoundResource = errors.New("resource not found")
 
-	// FatalLimitedRateLimits github client id and github client secret are unavailable
-	FatalLimitedRateLimits = "github client id and github client secret are unavailable"
+	// ErrFatalLimitedRateLimits github client id and github client secret are unavailable
+	ErrFatalLimitedRateLimits = errors.New("github client id and github client secret are unavailable")
 )
 
 // IGitService git service interface.
@@ -78,7 +74,7 @@ type GitService struct {
 func (g GitService) GetContents(ctx context.Context, rawURL string, branchName *string) (*string, *errs.HTTPTypeError) {
 	// GetAttributes returns a BadRequest error and
 	// will print the error to the user.
-	u, err := netURL.Parse(rawURL)
+	u, err := url.Parse(rawURL)
 	if err != nil {
 		return nil, errs.ErrBadRequest(ErrBadRequestInvalidPath)
 	}
@@ -162,7 +158,7 @@ func isMaven(ctx context.Context, ghService GitService, requestAttrs requestAttr
 		logorus.Logger().
 			WithField(ghClientID, t.ClientID).
 			WithField(ghClientSecret, t.ClientSecret).
-			Fatalf(FatalLimitedRateLimits)
+			Fatalf(ErrFatalLimitedRateLimits.Error())
 	}
 
 	// Check that the repository + branch exists first.
