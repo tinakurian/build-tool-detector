@@ -5,12 +5,13 @@ package main
 import (
 	"flag"
 	"fmt"
+	"os"
+
 	"github.com/goadesign/goa"
 	"github.com/goadesign/goa/middleware"
 	"github.com/tinakurian/build-tool-detector/app"
 	controllers "github.com/tinakurian/build-tool-detector/controllers"
 	logorus "github.com/tinakurian/build-tool-detector/log"
-	"os"
 )
 
 var (

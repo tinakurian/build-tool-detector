@@ -31,14 +31,16 @@ type requestAttributes struct {
 }
 
 const (
-	master     = "master"
-	tree       = "tree"
-	slash      = "/"
-	pom        = "pom.xml"
-	segments   = "segments"
-	branch     = "branch"
-	attributes = "attributes"
-	url        = "url"
+	master         = "master"
+	tree           = "tree"
+	slash          = "/"
+	pom            = "pom.xml"
+	segments       = "segments"
+	branch         = "branch"
+	attributes     = "attributes"
+	url            = "url"
+	ghClientID     = "ghClientID"
+	ghClientSecret = "ghClientSecret"
 )
 
 var (
@@ -57,8 +59,8 @@ var (
 	// ErrNotFoundResource no resource found.
 	ErrNotFoundResource = errors.New("resource not found")
 
-	// InfoLimitedRateLimits rate limits restricted due to unset environment variables
-	InfoLimitedRateLimits = "rate limits will be restricted due to github client id and github client secret being unavailable"
+	// FatalLimitedRateLimits github client id and github client secret are unavailable
+	FatalLimitedRateLimits = "github client id and github client secret are unavailable"
 )
 
 // IGitService git service interface.
@@ -129,9 +131,6 @@ func getServiceAttributes(segments []string, ctxBranch *string) (*errs.HTTPTypeE
 	branch := master
 
 	if len(segments) <= 2 {
-		logorus.Logger().
-			WithField(attributes, requestAttrs).
-			Warningf(ErrBadRequestInvalidPath.Error())
 		return errs.ErrBadRequest(ErrBadRequestInvalidPath), requestAttrs
 	}
 
@@ -172,15 +171,14 @@ func isMaven(ctx context.Context, ghService GitService, requestAttrs requestAttr
 	client := github.NewClient(t.Client())
 	if t.ClientID == "" || t.ClientSecret == "" {
 		logorus.Logger().
-			Fatalf(InfoLimitedRateLimits)
+			WithField(ghClientID, t.ClientID).
+			WithField(ghClientSecret, t.ClientSecret).
+			Fatalf(FatalLimitedRateLimits)
 	}
 
 	// Check that the repository + branch exists first.
 	_, _, err := client.Repositories.GetBranch(ctx, requestAttrs.Owner, requestAttrs.Repository, requestAttrs.Branch)
 	if err != nil {
-		logorus.Logger().
-			WithField(attributes, requestAttrs).
-			Warningf(ErrBadRequestInvalidPath.Error())
 		return errs.ErrNotFoundError(ErrNotFoundResource)
 	}
 
@@ -191,9 +189,6 @@ func isMaven(ctx context.Context, ghService GitService, requestAttrs requestAttr
 		pom,
 		&github.RepositoryContentGetOptions{Ref: requestAttrs.Branch})
 	if err != nil && resp.StatusCode != http.StatusOK {
-		logorus.Logger().
-			WithField(attributes, requestAttrs).
-			Warningf(ErrInternalServerErrorFailedContentRetrieval.Error())
 		return errs.ErrInternalServerError(ErrInternalServerErrorFailedContentRetrieval)
 	}
 	return nil

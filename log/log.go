@@ -1,9 +1,10 @@
 package log
 
 import (
+	"os"
+
 	"github.com/evalphobia/logrus_sentry"
 	"github.com/sirupsen/logrus"
-	"os"
 )
 
 // Logger something

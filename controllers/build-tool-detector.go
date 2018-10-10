@@ -10,7 +10,10 @@ package controllers
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
+	"net/http"
+
 	"github.com/goadesign/goa"
 	"github.com/tinakurian/build-tool-detector/app"
 	"github.com/tinakurian/build-tool-detector/controllers/buildtype"
@@ -18,7 +21,21 @@ import (
 	"github.com/tinakurian/build-tool-detector/controllers/git"
 	"github.com/tinakurian/build-tool-detector/controllers/system"
 	logorus "github.com/tinakurian/build-tool-detector/log"
-	"net/http"
+)
+
+var (
+	// ErrInternalServerErrorFailedJSONMarshal unable to marshal json.
+	ErrInternalServerErrorFailedJSONMarshal = errors.New("unable to marshal json")
+
+	// ErrInternalServerErrorFailedPropagate unable to propagate error
+	ErrInternalServerErrorFailedPropagate = errors.New("unable to propagate error")
+)
+
+const (
+	errorz                      = "error"
+	contentType                 = "Content-Type"
+	applicationJSON             = "application/json"
+	buildToolDetectorController = "BuildToolDetectorController"
 )
 
 // BuildToolDetectorController implements the build-tool-detector resource.
@@ -30,7 +47,7 @@ type BuildToolDetectorController struct {
 
 // NewBuildToolDetectorController creates a build-tool-detector controller.
 func NewBuildToolDetectorController(service *goa.Service, ghClientID string, ghClientSecret string) *BuildToolDetectorController {
-	return &BuildToolDetectorController{Controller: service.NewController("BuildToolDetectorController"), ghClientID: ghClientID, ghClientSecret: ghClientSecret}
+	return &BuildToolDetectorController{Controller: service.NewController(buildToolDetectorController), ghClientID: ghClientID, ghClientSecret: ghClientSecret}
 }
 
 // Show runs the show action.
@@ -55,7 +72,7 @@ func (c *BuildToolDetectorController) Show(ctx *app.ShowBuildToolDetectorContext
 
 // handleRequest handles returning the correct goa context as well as the GoaBuildToolDetector response
 func handleRequest(ctx *app.ShowBuildToolDetectorContext, httpTypeError *errs.HTTPTypeError, buildToolType *string) error {
-	ctx.ResponseWriter.Header().Set("Content-Type", "application/json")
+	ctx.ResponseWriter.Header().Set(contentType, applicationJSON)
 	if (httpTypeError == nil || httpTypeError.StatusCode == http.StatusInternalServerError) && buildToolType != nil {
 		buildTool := buildtype.Unknown()
 		if buildtype.MAVEN == *buildToolType {
@@ -67,12 +84,12 @@ func handleRequest(ctx *app.ShowBuildToolDetectorContext, httpTypeError *errs.HT
 	ctx.WriteHeader(httpTypeError.StatusCode)
 	jsonHTTPTypeError, err := json.Marshal(httpTypeError)
 	if err != nil {
-		logorus.Logger().WithError(err).WithField("error", httpTypeError).Errorf("unable to marshal json")
+		logorus.Logger().WithError(err).WithField(errorz, httpTypeError).Errorf(ErrInternalServerErrorFailedJSONMarshal.Error())
 		return ctx.InternalServerError()
 	}
 
 	if _, err := fmt.Fprint(ctx.ResponseWriter, string(jsonHTTPTypeError)); err != nil {
-		logorus.Logger().WithError(err).WithField("error", jsonHTTPTypeError).Errorf("unable to propagate error")
+		logorus.Logger().WithError(err).WithField(errorz, jsonHTTPTypeError).Errorf(ErrInternalServerErrorFailedPropagate.Error())
 		return ctx.InternalServerError()
 	}
 
