@@ -27,7 +27,7 @@ func main() {
 		logorus.Logger().
 			WithField("GH_CLIENT_ID", ghClientID).
 			WithField("GH_CLIENT_SECRET", ghClientSecret).
-			Fatalf("Cannot run application without GH_CLIENT_ID and GH_CLIENT_SECRET")
+			Fatalf("cannot run application without GH_CLIENT_ID and GH_CLIENT_SECRET")
 	}
 
 	// Export Sentry DSN for logging
@@ -35,7 +35,7 @@ func main() {
 	if err != nil {
 		logorus.Logger().
 			WithField("SENTRY_DSN", sentryDSN).
-			Fatalf("Failed to set environment variable for SENTRY_DSN: %v", sentryDSN)
+			Fatalf("failed to set environment variable for SENTRY_DSN: %v", sentryDSN)
 	}
 
 	// Create service
