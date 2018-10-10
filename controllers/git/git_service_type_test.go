@@ -60,8 +60,8 @@ var _ = Describe("GitServiceType", func() {
 
 	Context("Service", func() {
 		It("Github", func() {
-			service := git.Service{}.GetGitHubService()
-			Expect(service).Should(BeEquivalentTo(&github.GitService{}), "service type should be a git service")
+			service := git.Service{}.GetGitHubService("test", "test")
+			Expect(service).Should(BeEquivalentTo(&github.GitService{ClientID: "test", ClientSecret: "test"}), "service type should be a git service")
 		})
 	})
 })

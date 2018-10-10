@@ -42,12 +42,12 @@ type Service struct{}
 
 // IService service interface.
 type IService interface {
-	GetGitHubService(string)
+	GetGitHubService(string, string)
 }
 
 // GetGitHubService gets the github service.
-func (s Service) GetGitHubService() *github.GitService {
-	return &github.GitService{}
+func (s Service) GetGitHubService(ghClientID string, ghClientSecret string) *github.GitService {
+	return &github.GitService{ClientID: ghClientID, ClientSecret: ghClientSecret}
 }
 
 // GetGitServiceType performs a simple url parse and split

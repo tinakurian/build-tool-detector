@@ -18,7 +18,7 @@ var _ = a.API("build-tool-detector", func() {
 		a.Credentials()
 	})
 	a.Title("Build Tool Detector")
-	a.Description("Detects the build tool for a specific repository and branch")
+	a.Description("Detects the build tool for a specific repository and branch. Currently, this tool only supports detecting the build tool maven for github repositories.")
 	a.Scheme("http")
 	a.Host("localhost:8080")
 	a.BasePath("/build-tool-detector")

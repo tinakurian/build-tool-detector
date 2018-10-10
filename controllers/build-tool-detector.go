@@ -25,10 +25,12 @@ import (
 // BuildToolDetectorController implements the build-tool-detector resource.
 type BuildToolDetectorController struct {
 	*goa.Controller
+	ghClientID     string
+	ghClientSecret string
 }
 
 // NewBuildToolDetectorController creates a build-tool-detector controller.
-func NewBuildToolDetectorController(service *goa.Service) *BuildToolDetectorController {
+func NewBuildToolDetectorController(service *goa.Service, ghClientID string, ghClientSecret string) *BuildToolDetectorController {
 	return &BuildToolDetectorController{Controller: service.NewController("BuildToolDetectorController")}
 }
 
@@ -41,7 +43,7 @@ func (c *BuildToolDetectorController) Show(ctx *app.ShowBuildToolDetectorContext
 	}
 
 	gitService := system.System{}.GetGitService()
-	err, buildToolType := gitService.GetGitHubService().GetContents(ctx.Context, rawURL, ctx.Branch)
+	err, buildToolType := gitService.GetGitHubService(c.ghClientID, c.ghClientSecret).GetContents(ctx.Context, rawURL, ctx.Branch)
 	if err != nil {
 		if err.StatusCode == http.StatusBadRequest {
 			return handleRequest(ctx, err, nil)

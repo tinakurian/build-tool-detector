@@ -14,7 +14,6 @@ import (
 	"errors"
 	"net/http"
 	netURL "net/url"
-	"os"
 	"strings"
 
 	"github.com/google/go-github/github"
@@ -68,7 +67,10 @@ type IGitService interface {
 }
 
 // GitService struct.
-type GitService struct{}
+type GitService struct {
+	ClientID     string
+	ClientSecret string
+}
 
 // GetContents gets the contents for the service.
 func (g GitService) GetContents(ctx context.Context, rawURL string, branchName *string) (*errs.HTTPTypeError, *string) {
@@ -97,7 +99,7 @@ func (g GitService) GetContents(ctx context.Context, rawURL string, branchName *
 	// InternalServerError and will print
 	// the buildTool as unknown.
 	buildTool := buildtype.UNKNOWN
-	httpTypeError = isMaven(ctx, serviceAttribute)
+	httpTypeError = isMaven(ctx, g, serviceAttribute)
 	if httpTypeError != nil {
 		logorus.Logger().
 			WithField(attributes, serviceAttribute).
@@ -156,18 +158,17 @@ func getServiceAttributes(segments []string, ctxBranch *string) (*errs.HTTPTypeE
 	return nil, requestAttrs
 }
 
-func isMaven(ctx context.Context, requestAttrs requestAttributes) *errs.HTTPTypeError {
+func isMaven(ctx context.Context, ghService GitService, requestAttrs requestAttributes) *errs.HTTPTypeError {
 
 	// Get the github client id and github client
 	// secret if set to get better rate limits.
 	t := github.UnauthenticatedRateLimitedTransport{
-		ClientID:     os.Getenv("GITHUB_CLIENT_ID"),
-		ClientSecret: os.Getenv("GITHUB_CLIENT_SECRET"),
+		ClientID:     ghService.ClientID,
+		ClientSecret: ghService.ClientSecret,
 	}
 
 	// If the github client id or github client
-	// secret are empty, we will default to using
-	// the github client with minimal rate limits.
+	// secret are empty, we will log and fail.
 	client := github.NewClient(t.Client())
 	if t.ClientID == "" || t.ClientSecret == "" {
 		logorus.Logger().

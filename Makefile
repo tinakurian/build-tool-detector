@@ -18,6 +18,7 @@ ifneq ($(GITUNTRACKEDCHANGES),)
   COMMIT := $(COMMIT)-dirty
 endif
 LDFLAGS="-X main.Commit=${COMMIT} -X main.BuildTime=${BUILD_TIME}"
+LDFLAGS2="-X main.ghClientID=${ghClientID} -X main.ghClientSecret=${ghClientSecret}"
 
 SOURCEDIR=.
 SOURCES := $(shell find $(SOURCEDIR) -name '*.go')
@@ -68,7 +69,7 @@ check: ## Concurrently runs a whole bunch of static analysis tools
 
 .PHONY: run
 run: ## runs the service locally
-	${BINARY_DIR}/${BINARY}
+	${BINARY_DIR}/${BINARY} -ghClientID=$(ghClientID) -ghClientSecret=$(ghClientSecret)
 
 .PHONY: tools
 tools: ## Installs all necessary tools
