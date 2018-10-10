@@ -1,3 +1,11 @@
+/*
+
+Package log is used to log problems
+with the service using sentry and logorus.
+If a sentry_dsn  is not provided, the
+log output will be sent to stdout.
+
+*/
 package log
 
 import (
