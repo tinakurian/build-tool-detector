@@ -4,20 +4,19 @@ package main
 
 import (
 	"flag"
-	"fmt"
-	"os"
-
 	"github.com/goadesign/goa"
 	"github.com/goadesign/goa/middleware"
 	"github.com/tinakurian/build-tool-detector/app"
 	controllers "github.com/tinakurian/build-tool-detector/controllers"
 	logorus "github.com/tinakurian/build-tool-detector/log"
+	"os"
 )
 
 var (
-	ghClientID     = flag.String("ghClientID", "", "Github Client ID")
-	ghClientSecret = flag.String("ghClientSecret", "", "Github Client Secret")
-	sentryDSN      = flag.String("sentryDSN", "", "Sentry DSN")
+	port           = flag.String("PORT", "8080", "port")
+	ghClientID     = flag.String("GH_CLIENT_ID", "", "Github Client ID")
+	ghClientSecret = flag.String("GH_CLIENT_SECRET", "", "Github Client Secret")
+	sentryDSN      = flag.String("SENTRY_DSN", "", "Sentry DSN")
 )
 
 func main() {
@@ -30,7 +29,6 @@ func main() {
 			Fatalf("Cannot run application without ghClientID and ghClientSecret")
 	}
 
-	fmt.Printf("SENTRYYYYYYYYYYYYYYYYY: %v \n\n\n\n", *sentryDSN)
 	// Export Sentry DSN for logging
 	err := os.Setenv("BUILD_TOOL_DETECTOR_SENTRY_DSN", *sentryDSN)
 	if err != nil {
@@ -56,7 +54,7 @@ func main() {
 	app.MountSwaggerController(service, cs)
 
 	// Start service
-	if err := service.ListenAndServe(":8080"); err != nil {
+	if err := service.ListenAndServe(":" + *port); err != nil {
 		service.LogError("startup", "err", err)
 	}
 }

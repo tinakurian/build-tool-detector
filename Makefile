@@ -1,9 +1,9 @@
 #! /usr/bin/make
 
 CURRENT_DIR := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
-
 PROJECT_REPO := 'github.com/tinakurian'
 PROJECT_NAME := 'build-tool-detector'
+PORT := '8080'
 
 .DEFAULT_GOAL := all
 
@@ -69,7 +69,8 @@ check: ## Concurrently runs a whole bunch of static analysis tools
 
 .PHONY: run
 run: ## runs the service locally
-	${BINARY_DIR}/${BINARY} -ghClientID=$(ghClientID) -ghClientSecret=$(ghClientSecret) -sentryDSN=$(sentryDSN)
+	port=8080
+	${BINARY_DIR}/${BINARY} -PORT=$(PORT) -GH_CLIENT_ID=$(GH_CLIENT_ID) -GH_CLIENT_SECRET=$(GH_CLIENT_SECRET) -SENTRY_DSN=$(SENTRY_DSN)
 
 .PHONY: tools
 tools: ## Installs all necessary tools
