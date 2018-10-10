@@ -1,10 +1,9 @@
 package log
 
 import (
-	"os"
-
 	"github.com/evalphobia/logrus_sentry"
 	"github.com/sirupsen/logrus"
+	"os"
 )
 
 // Logger something
@@ -15,15 +14,13 @@ func Logger() *logrus.Entry {
 
 	// TODO: have env variable to specify we are running tests which
 	// will return a different logger.
-	sentryDSN := os.Getenv("SENTRY_DSN")
-
+	sentryDSN := os.Getenv("BUILD_TOOL_DETECTOR_SENTRY_DSN")
 	if sentryDSN != "" {
 		hook, err := logrus_sentry.NewSentryHook(sentryDSN, []logrus.Level{
 			logrus.PanicLevel,
 			logrus.FatalLevel,
 			logrus.ErrorLevel,
 			logrus.WarnLevel,
-			logrus.InfoLevel,
 		})
 
 		if err != nil {

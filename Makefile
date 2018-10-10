@@ -69,7 +69,7 @@ check: ## Concurrently runs a whole bunch of static analysis tools
 
 .PHONY: run
 run: ## runs the service locally
-	${BINARY_DIR}/${BINARY} -ghClientID=$(ghClientID) -ghClientSecret=$(ghClientSecret)
+	${BINARY_DIR}/${BINARY} -ghClientID=$(ghClientID) -ghClientSecret=$(ghClientSecret) -sentryDSN=$(sentryDSN)
 
 .PHONY: tools
 tools: ## Installs all necessary tools

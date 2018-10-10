@@ -172,8 +172,7 @@ func isMaven(ctx context.Context, ghService GitService, requestAttrs requestAttr
 	client := github.NewClient(t.Client())
 	if t.ClientID == "" || t.ClientSecret == "" {
 		logorus.Logger().
-			Infof(InfoLimitedRateLimits)
-		client = github.NewClient(nil)
+			Fatalf(InfoLimitedRateLimits)
 	}
 
 	// Check that the repository + branch exists first.

@@ -11,8 +11,6 @@ package controllers
 import (
 	"encoding/json"
 	"fmt"
-	"net/http"
-
 	"github.com/goadesign/goa"
 	"github.com/tinakurian/build-tool-detector/app"
 	"github.com/tinakurian/build-tool-detector/controllers/buildtype"
@@ -20,6 +18,7 @@ import (
 	"github.com/tinakurian/build-tool-detector/controllers/git"
 	"github.com/tinakurian/build-tool-detector/controllers/system"
 	logorus "github.com/tinakurian/build-tool-detector/log"
+	"net/http"
 )
 
 // BuildToolDetectorController implements the build-tool-detector resource.
@@ -31,7 +30,7 @@ type BuildToolDetectorController struct {
 
 // NewBuildToolDetectorController creates a build-tool-detector controller.
 func NewBuildToolDetectorController(service *goa.Service, ghClientID string, ghClientSecret string) *BuildToolDetectorController {
-	return &BuildToolDetectorController{Controller: service.NewController("BuildToolDetectorController")}
+	return &BuildToolDetectorController{Controller: service.NewController("BuildToolDetectorController"), ghClientID: ghClientID, ghClientSecret: ghClientSecret}
 }
 
 // Show runs the show action.
