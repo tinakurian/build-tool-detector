@@ -10,7 +10,7 @@ import (
 	. "github.com/onsi/ginkgo"
 	"github.com/onsi/gomega"
 	"github.com/tinakurian/build-tool-detector/controllers/git"
-	. "github.com/tinakurian/build-tool-detector/controllers/system"
+	. "github.com/tinakurian/build-tool-detector/domain/system"
 )
 
 var _ = Describe("Service", func() {
