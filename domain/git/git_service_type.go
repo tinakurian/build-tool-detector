@@ -16,7 +16,7 @@ import (
 	"strings"
 
 	errs "github.com/tinakurian/build-tool-detector/controllers/error"
-	"github.com/tinakurian/build-tool-detector/controllers/git/github"
+	"github.com/tinakurian/build-tool-detector/domain/git/github"
 )
 
 // constants to define the different

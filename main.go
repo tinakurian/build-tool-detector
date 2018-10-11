@@ -11,7 +11,7 @@ import (
 	"github.com/goadesign/goa/middleware"
 	"github.com/tinakurian/build-tool-detector/app"
 	controllers "github.com/tinakurian/build-tool-detector/controllers"
-	"github.com/tinakurian/build-tool-detector/controllers/git/github"
+	"github.com/tinakurian/build-tool-detector/domain/git/github"
 	"github.com/tinakurian/build-tool-detector/log"
 	logorus "github.com/tinakurian/build-tool-detector/log"
 )

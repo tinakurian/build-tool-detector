@@ -8,7 +8,7 @@ for this system.
 package system
 
 import (
-	"github.com/tinakurian/build-tool-detector/controllers/git"
+	"github.com/tinakurian/build-tool-detector/domain/git"
 )
 
 // System struct.

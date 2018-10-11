@@ -11,8 +11,8 @@ import (
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/tinakurian/build-tool-detector/controllers/git"
-	"github.com/tinakurian/build-tool-detector/controllers/git/github"
+	"github.com/tinakurian/build-tool-detector/domain/git"
+	"github.com/tinakurian/build-tool-detector/domain/git/github"
 )
 
 var _ = Describe("GitServiceType", func() {
