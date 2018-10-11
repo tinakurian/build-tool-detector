@@ -17,8 +17,8 @@ import (
 	"strings"
 
 	"github.com/google/go-github/github"
-	"github.com/tinakurian/build-tool-detector/controllers/buildtype"
 	errs "github.com/tinakurian/build-tool-detector/controllers/error"
+	"github.com/tinakurian/build-tool-detector/domain/buildtype"
 	logorus "github.com/tinakurian/build-tool-detector/log"
 )
 
