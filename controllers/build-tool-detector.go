@@ -55,14 +55,14 @@ func (c *BuildToolDetectorController) Show(ctx *app.ShowBuildToolDetectorContext
 	rawURL := ctx.URL
 	_, err := git.GetGitServiceType(rawURL)
 	if err != nil {
-		return handleError(ctx, *err)
+		return handleError(ctx, err)
 	}
 
 	gitService := system.System{}.GetGitService()
 	ctx.ResponseWriter.Header().Set(contentType, applicationJSON)
 	buildToolType, err := gitService.GetGitHubService(c.ghClientID, c.ghClientSecret).GetContents(ctx.Context, rawURL, ctx.Branch)
 	if err != nil {
-		return handleError(ctx, *err)
+		return handleError(ctx, err)
 	}
 
 	buildTool := buildtype.Unknown()

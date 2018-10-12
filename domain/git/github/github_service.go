@@ -76,12 +76,12 @@ type GitService struct {
 }
 
 // GetContents gets the contents for the service.
-func (g GitService) GetContents(ctx context.Context, rawURL string, branchName *string) (*string, *error) {
+func (g GitService) GetContents(ctx context.Context, rawURL string, branchName *string) (*string, error) {
 	// GetAttributes returns a BadRequest error and
 	// will print the error to the user.
 	u, err := url.Parse(rawURL)
 	if err != nil {
-		return nil, &ErrInvalidPath
+		return nil, ErrInvalidPath
 	}
 
 	urlSegments := strings.Split(u.Path, slash)
@@ -111,7 +111,7 @@ func (g GitService) GetContents(ctx context.Context, rawURL string, branchName *
 // struct. The attributes struct will be used
 // to make a request to github to determine
 // the build tool type.
-func getServiceAttributes(segments []string, ctxBranch *string) (requestAttributes, *error) {
+func getServiceAttributes(segments []string, ctxBranch *string) (requestAttributes, error) {
 
 	var requestAttrs requestAttributes
 
@@ -121,7 +121,7 @@ func getServiceAttributes(segments []string, ctxBranch *string) (requestAttribut
 	branch := master
 
 	if len(segments) <= 2 {
-		return requestAttrs, &ErrInvalidPath
+		return requestAttrs, ErrInvalidPath
 	}
 
 	// If the query parameter field 'branch' is not
@@ -147,7 +147,7 @@ func getServiceAttributes(segments []string, ctxBranch *string) (requestAttribut
 	return requestAttrs, nil
 }
 
-func isMaven(ctx context.Context, ghService GitService, requestAttrs requestAttributes) (bool, *error) {
+func isMaven(ctx context.Context, ghService GitService, requestAttrs requestAttributes) (bool, error) {
 
 	// Get the github client id and github client
 	// secret if set to get better rate limits.
@@ -169,7 +169,7 @@ func isMaven(ctx context.Context, ghService GitService, requestAttrs requestAttr
 	// Check that the repository + branch exists first.
 	_, _, err := client.Repositories.GetBranch(ctx, requestAttrs.Owner, requestAttrs.Repository, requestAttrs.Branch)
 	if err != nil {
-		return false, &ErrResourceNotFound
+		return false, ErrResourceNotFound
 	}
 
 	// If the repository and branch exists, get the contents for the repository.
@@ -179,7 +179,7 @@ func isMaven(ctx context.Context, ghService GitService, requestAttrs requestAttr
 		pom,
 		&github.RepositoryContentGetOptions{Ref: requestAttrs.Branch})
 	if err != nil && resp.StatusCode != http.StatusOK {
-		return false, &ErrFailedContentRetrieval
+		return false, ErrFailedContentRetrieval
 	}
 	return true, nil
 }

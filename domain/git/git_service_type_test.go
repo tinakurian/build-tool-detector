@@ -16,29 +16,25 @@ import (
 var _ = Describe("GitServiceType", func() {
 	Context("GetGitServiceType", func() {
 		It("Faulty Host - empty", func() {
-			serviceType, errz := git.GetGitServiceType("")
-			err := *errz
+			serviceType, err := git.GetGitServiceType("")
 			Expect(serviceType).Should(BeNil(), "service type should be 'nil'")
 			Expect(err.Error()).Should(BeEquivalentTo(github.ErrInvalidPath.Error()), "service type should be '400'")
 		})
 
 		It("Faulty Host - non-existent", func() {
-			serviceType, errz := git.GetGitServiceType("test/test")
-			err := *errz
+			serviceType, err := git.GetGitServiceType("test/test")
 			Expect(serviceType).Should(BeNil(), "service type should be 'nil'")
 			Expect(err.Error()).Should(BeEquivalentTo(github.ErrInvalidPath.Error()), "service type should be '400'")
 		})
 
 		It("Faulty Host - not github.com", func() {
-			serviceType, errz := git.GetGitServiceType("http://test.com/test/test")
-			err := *errz
+			serviceType, err := git.GetGitServiceType("http://test.com/test/test")
 			Expect(serviceType).Should(BeNil(), "service type should be 'nil'")
 			Expect(err.Error()).Should(BeEquivalentTo(github.ErrUnsupportedService.Error()), "service type should be '500'")
 		})
 
 		It("Faulty url - no repository", func() {
-			serviceType, errz := git.GetGitServiceType("http://github.com/test")
-			err := *errz
+			serviceType, err := git.GetGitServiceType("http://github.com/test")
 			Expect(serviceType).Should(BeNil(), "service type should be 'nil'")
 			Expect(err.Error()).Should(BeEquivalentTo(github.ErrUnsupportedGithubURL.Error()), "service type should be '400'")
 		})
