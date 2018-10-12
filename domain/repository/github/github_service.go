@@ -17,18 +17,9 @@ import (
 	"strings"
 
 	"github.com/google/go-github/github"
-	errs "github.com/tinakurian/build-tool-detector/controllers/error"
-	"github.com/tinakurian/build-tool-detector/domain/buildtype"
-	logorus "github.com/tinakurian/build-tool-detector/log"
+	"github.com/tinakurian/build-tool-detector/domain/types"
+	"github.com/tinakurian/build-tool-detector/log"
 )
-
-// serviceAttributes used for retrieving
-// data using the go-github library.
-type requestAttributes struct {
-	Owner      string
-	Repository string
-	Branch     string
-}
 
 const (
 	// ClientID github client id
@@ -64,19 +55,20 @@ var (
 	ErrFatalMissingGHAttributes = errors.New("github client id and github client secret are unavailable")
 )
 
-// IGitService git service interface.
-type IGitService interface {
-	GetContents(ctx context.Context) (*errs.HTTPTypeError, *string)
-}
-
-// GitService struct.
-type GitService struct {
+// Service struct.
+type Service struct {
 	ClientID     string
 	ClientSecret string
 }
 
+// Create instantiate Github repository
+func Create() *Service {
+	// TODO figure out from where this needs to be fetched - maybe we construct it differently somewhere else - this is just an idea
+	return &Service{ClientID: "need-to-pass-it", ClientSecret: "need-to-pass-it-too"}
+}
+
 // GetContents gets the contents for the service.
-func (g GitService) GetContents(ctx context.Context, rawURL string, branchName *string) (*string, error) {
+func (g Service) GetContents(ctx context.Context, rawURL string, branchName *string) (*string, error) {
 	// GetAttributes returns a BadRequest error and
 	// will print the error to the user.
 	u, err := url.Parse(rawURL)
@@ -93,7 +85,7 @@ func (g GitService) GetContents(ctx context.Context, rawURL string, branchName *
 	// getGithubRepositoryPom returns an
 	// InternalServerError and will print
 	// the buildTool as unknown.
-	buildTool := buildtype.UNKNOWN
+	buildTool := types.UnknownBuild
 	_, errs = isMaven(ctx, g, serviceAttribute)
 	if errs != nil {
 		return &buildTool, errs
@@ -101,7 +93,7 @@ func (g GitService) GetContents(ctx context.Context, rawURL string, branchName *
 
 	// Reset the buildToolType to maven since
 	// the pom.xml was retrievable.
-	buildTool = buildtype.MAVEN
+	buildTool = types.MavenBuild
 
 	return &buildTool, nil
 }
@@ -111,9 +103,9 @@ func (g GitService) GetContents(ctx context.Context, rawURL string, branchName *
 // struct. The attributes struct will be used
 // to make a request to github to determine
 // the build tool type.
-func getServiceAttributes(segments []string, ctxBranch *string) (requestAttributes, error) {
+func getServiceAttributes(segments []string, ctxBranch *string) (types.Repository, error) {
 
-	var requestAttrs requestAttributes
+	var requestAttrs types.Repository
 
 	// Default branch that will be used if a branch
 	// is not passed in though the optional 'branch'
@@ -138,7 +130,7 @@ func getServiceAttributes(segments []string, ctxBranch *string) (requestAttribut
 		}
 	}
 
-	requestAttrs = requestAttributes{
+	requestAttrs = types.Repository{
 		Owner:      segments[1],
 		Repository: segments[2],
 		Branch:     branch,
@@ -147,7 +139,7 @@ func getServiceAttributes(segments []string, ctxBranch *string) (requestAttribut
 	return requestAttrs, nil
 }
 
-func isMaven(ctx context.Context, ghService GitService, requestAttrs requestAttributes) (bool, error) {
+func isMaven(ctx context.Context, ghService Service, requestAttrs types.Repository) (bool, error) {
 
 	// Get the github client id and github client
 	// secret if set to get better rate limits.
@@ -160,7 +152,7 @@ func isMaven(ctx context.Context, ghService GitService, requestAttrs requestAttr
 	// secret are empty, we will log and fail.
 	client := github.NewClient(t.Client())
 	if t.ClientID == "" || t.ClientSecret == "" {
-		logorus.Logger().
+		log.Logger().
 			WithField(ClientID, t.ClientID).
 			WithField(ClientSecret, t.ClientSecret).
 			Fatalf(ErrFatalMissingGHAttributes.Error())

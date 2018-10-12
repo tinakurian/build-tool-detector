@@ -4,62 +4,46 @@ Package git_test is used to test the functionality
 within the git package.
 
 */
-package git_test
+package repository_test
 
 import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/tinakurian/build-tool-detector/domain/git"
-	"github.com/tinakurian/build-tool-detector/domain/git/github"
+	"github.com/tinakurian/build-tool-detector/domain/repository/github"
+	"github.com/tinakurian/build-tool-detector/domain/repository"
 )
 
 var _ = Describe("GitServiceType", func() {
-	Context("GetGitServiceType", func() {
+	Context("CreateService", func() {
 		It("Faulty Host - empty", func() {
-			serviceType, err := git.GetGitServiceType("")
+			serviceType, err := repository.CreateService("")
 			Expect(serviceType).Should(BeNil(), "service type should be 'nil'")
 			Expect(err.Error()).Should(BeEquivalentTo(github.ErrInvalidPath.Error()), "service type should be '400'")
 		})
 
 		It("Faulty Host - non-existent", func() {
-			serviceType, err := git.GetGitServiceType("test/test")
+			serviceType, err := repository.CreateService("test/test")
 			Expect(serviceType).Should(BeNil(), "service type should be 'nil'")
 			Expect(err.Error()).Should(BeEquivalentTo(github.ErrInvalidPath.Error()), "service type should be '400'")
 		})
 
 		It("Faulty Host - not github.com", func() {
-			serviceType, err := git.GetGitServiceType("http://test.com/test/test")
+			serviceType, err := repository.CreateService("http://test.com/test/test")
 			Expect(serviceType).Should(BeNil(), "service type should be 'nil'")
 			Expect(err.Error()).Should(BeEquivalentTo(github.ErrUnsupportedService.Error()), "service type should be '500'")
 		})
 
 		It("Faulty url - no repository", func() {
-			serviceType, err := git.GetGitServiceType("http://github.com/test")
+			serviceType, err := repository.CreateService("http://github.com/test")
 			Expect(serviceType).Should(BeNil(), "service type should be 'nil'")
 			Expect(err.Error()).Should(BeEquivalentTo(github.ErrUnsupportedGithubURL.Error()), "service type should be '400'")
 		})
 
 		It("Correct url - non-existent", func() {
-			serviceType, err := git.GetGitServiceType("http://github.com/test/test")
+			serviceType, err := repository.CreateService("http://github.com/test/test")
 			Expect(serviceType).ShouldNot(BeNil(), "service type should be not be'nil'")
 			Expect(err).Should(BeNil(), "err should be 'nil'")
 		})
 	})
 
-	Context("Constants", func() {
-		It("Github", func() {
-			Expect(git.Github).Should(BeEquivalentTo("github"), "git.GITHUB should be 'github'")
-		})
-
-		It("Unknown", func() {
-			Expect(git.Unknown).Should(BeEquivalentTo("unknown"), "git.UNKNOWN should be 'unknown'")
-		})
-	})
-
-	Context("Service", func() {
-		It("Github", func() {
-			service := git.Service{}.GetGitHubService("test", "test")
-			Expect(service).Should(BeEquivalentTo(&github.GitService{ClientID: "test", ClientSecret: "test"}), "service type should be a git service")
-		})
-	})
 })

@@ -16,11 +16,10 @@ import (
 	"github.com/goadesign/goa"
 	"github.com/tinakurian/build-tool-detector/app"
 	errs "github.com/tinakurian/build-tool-detector/controllers/error"
-	"github.com/tinakurian/build-tool-detector/domain/buildtype"
-	"github.com/tinakurian/build-tool-detector/domain/git"
-	"github.com/tinakurian/build-tool-detector/domain/git/github"
-	"github.com/tinakurian/build-tool-detector/domain/system"
-	logorus "github.com/tinakurian/build-tool-detector/log"
+	"github.com/tinakurian/build-tool-detector/domain/repository"
+	"github.com/tinakurian/build-tool-detector/domain/repository/github"
+	"github.com/tinakurian/build-tool-detector/log"
+	"github.com/tinakurian/build-tool-detector/domain/types"
 )
 
 var (
@@ -53,21 +52,28 @@ func NewBuildToolDetectorController(service *goa.Service, ghClientID string, ghC
 // Show runs the show action.
 func (c *BuildToolDetectorController) Show(ctx *app.ShowBuildToolDetectorContext) error {
 	rawURL := ctx.URL
-	_, err := git.GetGitServiceType(rawURL)
+	// TODO Here's what I think we can do
+	// - create a service called BuildToolDetector which will take repository service as a collaborator
+	// - exposes simple method Detect (need to figure out what kind of params are really needed) which returns BuildTyp
+	//   - the idea is that RepositoryService interacts on GH API level
+	//   - build-related logic will sit in this new service
+	//   - so we don't mix two layers of abstraction in one place
+	// In here simple orchestration only should reside
+	repositoryService, err := repository.CreateService(rawURL)
 	if err != nil {
 		return handleError(ctx, err)
 	}
 
-	gitService := system.System{}.GetGitService()
 	ctx.ResponseWriter.Header().Set(contentType, applicationJSON)
-	buildToolType, err := gitService.GetGitHubService(c.ghClientID, c.ghClientSecret).GetContents(ctx.Context, rawURL, ctx.Branch)
+	// TODO  This call goes away in favor of Detect()
+	buildToolType, err := repositoryService.GetContents(ctx.Context, rawURL, ctx.Branch)
 	if err != nil {
 		return handleError(ctx, err)
 	}
 
-	buildTool := buildtype.Unknown()
-	if buildtype.MAVEN == *buildToolType {
-		buildTool = buildtype.Maven()
+	buildTool := types.Unknown()
+	if types.MavenBuild == *buildToolType {
+		buildTool = types.Maven()
 	}
 	return ctx.OK(buildTool)
 
@@ -98,7 +104,7 @@ func handleError(ctx *app.ShowBuildToolDetectorContext, err error) error {
 		}
 		return ctx.InternalServerError()
 	case github.ErrFailedContentRetrieval.Error():
-		buildTool := buildtype.Unknown()
+		buildTool := types.Unknown()
 		return ctx.OK(buildTool)
 	default:
 		return ctx.InternalServerError()
@@ -109,12 +115,12 @@ func formatResponse(ctx *app.ShowBuildToolDetectorContext, httpTypeError *errs.H
 	ctx.WriteHeader(httpTypeError.StatusCode)
 	jsonHTTPTypeError, err := json.Marshal(httpTypeError)
 	if err != nil {
-		logorus.Logger().WithError(err).WithField(errorz, httpTypeError).Errorf(ErrFailedJSONMarshal.Error())
+		log.Logger().WithError(err).WithField(errorz, httpTypeError).Errorf(ErrFailedJSONMarshal.Error())
 		return ctx.InternalServerError()
 	}
 
 	if _, err := fmt.Fprint(ctx.ResponseWriter, string(jsonHTTPTypeError)); err != nil {
-		logorus.Logger().WithError(err).WithField(errorz, jsonHTTPTypeError).Errorf(ErrFailedPropagate.Error())
+		log.Logger().WithError(err).WithField(errorz, jsonHTTPTypeError).Errorf(ErrFailedPropagate.Error())
 		return ctx.InternalServerError()
 	}
 	return nil
