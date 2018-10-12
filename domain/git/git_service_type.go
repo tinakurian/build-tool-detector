@@ -15,7 +15,6 @@ import (
 	"net/url"
 	"strings"
 
-	errs "github.com/tinakurian/build-tool-detector/controllers/error"
 	"github.com/tinakurian/build-tool-detector/domain/git/github"
 )
 
@@ -53,24 +52,24 @@ func (s Service) GetGitHubService(ghClientID string, ghClientSecret string) *git
 //
 // Note: This method will likely need to be enhanced
 // to handle different github url formats.
-func GetGitServiceType(urlToParse string) (*string, *errs.HTTPTypeError) {
+func GetGitServiceType(urlToParse string) (*string, *error) {
 	gitServiceType := Github
 
 	u, err := url.Parse(urlToParse)
 
 	// Fail on error or empty host or empty scheme.
 	if err != nil || u.Host == "" || u.Scheme == "" {
-		return nil, errs.ErrBadRequest(github.ErrBadRequestInvalidPath)
+		return nil, &github.ErrInvalidPath
 	}
 
 	// Currently only support Github.
 	if u.Host != Github+dotcom {
-		return nil, errs.ErrInternalServerError(github.ErrInternalServerErrorUnsupportedService)
+		return nil, &github.ErrUnsupportedService
 	}
 
 	urlSegments := strings.Split(u.Path, slash)
 	if len(urlSegments) < 3 {
-		return nil, errs.ErrBadRequest(github.ErrInternalServerErrorUnsupportedGithubURL)
+		return nil, &github.ErrUnsupportedGithubURL
 	}
 
 	return &gitServiceType, nil

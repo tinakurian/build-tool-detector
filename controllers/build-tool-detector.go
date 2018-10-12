@@ -12,23 +12,23 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"net/http"
 
 	"github.com/goadesign/goa"
 	"github.com/tinakurian/build-tool-detector/app"
 	errs "github.com/tinakurian/build-tool-detector/controllers/error"
 	"github.com/tinakurian/build-tool-detector/domain/buildtype"
 	"github.com/tinakurian/build-tool-detector/domain/git"
+	"github.com/tinakurian/build-tool-detector/domain/git/github"
 	"github.com/tinakurian/build-tool-detector/domain/system"
 	logorus "github.com/tinakurian/build-tool-detector/log"
 )
 
 var (
-	// ErrInternalServerErrorFailedJSONMarshal unable to marshal json.
-	ErrInternalServerErrorFailedJSONMarshal = errors.New("unable to marshal json")
+	// ErrFailedJSONMarshal unable to marshal json.
+	ErrFailedJSONMarshal = errors.New("unable to marshal json")
 
-	// ErrInternalServerErrorFailedPropagate unable to propagate error
-	ErrInternalServerErrorFailedPropagate = errors.New("unable to propagate error")
+	// ErrFailedPropagate unable to propagate error
+	ErrFailedPropagate = errors.New("unable to propagate error")
 )
 
 const (
@@ -55,56 +55,67 @@ func (c *BuildToolDetectorController) Show(ctx *app.ShowBuildToolDetectorContext
 	rawURL := ctx.URL
 	_, err := git.GetGitServiceType(rawURL)
 	if err != nil {
-		return handleRequest(ctx, err, nil)
+		return handleError(ctx, *err)
 	}
 
 	gitService := system.System{}.GetGitService()
+	ctx.ResponseWriter.Header().Set(contentType, applicationJSON)
 	buildToolType, err := gitService.GetGitHubService(c.ghClientID, c.ghClientSecret).GetContents(ctx.Context, rawURL, ctx.Branch)
 	if err != nil {
-		if err.StatusCode == http.StatusBadRequest {
-			return handleRequest(ctx, err, nil)
-		}
-		return handleRequest(ctx, err, buildToolType)
+		return handleError(ctx, *err)
 	}
 
-	return handleRequest(ctx, nil, buildToolType)
+	buildTool := buildtype.Unknown()
+	if buildtype.MAVEN == *buildToolType {
+		buildTool = buildtype.Maven()
+	}
+	return ctx.OK(buildTool)
+
 }
 
-// handleRequest handles returning the correct goa context as well as the GoaBuildToolDetector response
-func handleRequest(ctx *app.ShowBuildToolDetectorContext, httpTypeError *errs.HTTPTypeError, buildToolType *string) error {
-	ctx.ResponseWriter.Header().Set(contentType, applicationJSON)
-	if (httpTypeError == nil || httpTypeError.StatusCode == http.StatusInternalServerError) && buildToolType != nil {
-		buildTool := buildtype.Unknown()
-		if buildtype.MAVEN == *buildToolType {
-			buildTool = buildtype.Maven()
+func handleError(ctx *app.ShowBuildToolDetectorContext, err error) error {
+	switch err.Error() {
+	case github.ErrInvalidPath.Error():
+		httpError := errs.ErrBadRequest(err)
+		writerErr := formatResponse(ctx, httpError)
+		if writerErr != nil {
+			return writerErr
 		}
+		return ctx.BadRequest()
+	case github.ErrResourceNotFound.Error():
+		httpError := errs.ErrNotFoundError(err)
+		writerErr := formatResponse(ctx, httpError)
+		if writerErr != nil {
+			return writerErr
+		}
+		return ctx.NotFound()
+	case github.ErrUnsupportedService.Error(),
+		github.ErrUnsupportedGithubURL.Error():
+		httpError := errs.ErrInternalServerError(err)
+		writerErr := formatResponse(ctx, httpError)
+		if writerErr != nil {
+			return writerErr
+		}
+		return ctx.InternalServerError()
+	case github.ErrFailedContentRetrieval.Error():
+		buildTool := buildtype.Unknown()
 		return ctx.OK(buildTool)
+	default:
+		return ctx.InternalServerError()
 	}
+}
 
+func formatResponse(ctx *app.ShowBuildToolDetectorContext, httpTypeError *errs.HTTPTypeError) error {
 	ctx.WriteHeader(httpTypeError.StatusCode)
 	jsonHTTPTypeError, err := json.Marshal(httpTypeError)
 	if err != nil {
-		logorus.Logger().WithError(err).WithField(errorz, httpTypeError).Errorf(ErrInternalServerErrorFailedJSONMarshal.Error())
+		logorus.Logger().WithError(err).WithField(errorz, httpTypeError).Errorf(ErrFailedJSONMarshal.Error())
 		return ctx.InternalServerError()
 	}
 
 	if _, err := fmt.Fprint(ctx.ResponseWriter, string(jsonHTTPTypeError)); err != nil {
-		logorus.Logger().WithError(err).WithField(errorz, jsonHTTPTypeError).Errorf(ErrInternalServerErrorFailedPropagate.Error())
+		logorus.Logger().WithError(err).WithField(errorz, jsonHTTPTypeError).Errorf(ErrFailedPropagate.Error())
 		return ctx.InternalServerError()
 	}
-
-	return getErrResponse(ctx, httpTypeError)
-}
-
-// getErrResponse will determine the correct goa error response
-func getErrResponse(ctx *app.ShowBuildToolDetectorContext, httpTypeError *errs.HTTPTypeError) error {
-	var response error
-	switch httpTypeError.StatusCode {
-	case http.StatusBadRequest:
-		response = ctx.BadRequest()
-	case http.StatusInternalServerError:
-		response = ctx.InternalServerError()
-	}
-
-	return response
+	return nil
 }

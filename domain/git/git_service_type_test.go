@@ -7,8 +7,6 @@ within the git package.
 package git_test
 
 import (
-	"net/http"
-
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/tinakurian/build-tool-detector/domain/git"
@@ -18,27 +16,31 @@ import (
 var _ = Describe("GitServiceType", func() {
 	Context("GetGitServiceType", func() {
 		It("Faulty Host - empty", func() {
-			serviceType, err := git.GetGitServiceType("")
+			serviceType, errz := git.GetGitServiceType("")
+			err := *errz
 			Expect(serviceType).Should(BeNil(), "service type should be 'nil'")
-			Expect(err.StatusCode).Should(BeEquivalentTo(http.StatusBadRequest), "service type should be '400'")
+			Expect(err.Error()).Should(BeEquivalentTo(github.ErrInvalidPath.Error()), "service type should be '400'")
 		})
 
 		It("Faulty Host - non-existent", func() {
-			serviceType, err := git.GetGitServiceType("test/test")
+			serviceType, errz := git.GetGitServiceType("test/test")
+			err := *errz
 			Expect(serviceType).Should(BeNil(), "service type should be 'nil'")
-			Expect(err.StatusCode).Should(BeEquivalentTo(http.StatusBadRequest), "service type should be '400'")
+			Expect(err.Error()).Should(BeEquivalentTo(github.ErrInvalidPath.Error()), "service type should be '400'")
 		})
 
 		It("Faulty Host - not github.com", func() {
-			serviceType, err := git.GetGitServiceType("http://test.com/test/test")
+			serviceType, errz := git.GetGitServiceType("http://test.com/test/test")
+			err := *errz
 			Expect(serviceType).Should(BeNil(), "service type should be 'nil'")
-			Expect(err.StatusCode).Should(BeEquivalentTo(http.StatusInternalServerError), "service type should be '500'")
+			Expect(err.Error()).Should(BeEquivalentTo(github.ErrUnsupportedService.Error()), "service type should be '500'")
 		})
 
 		It("Faulty url - no repository", func() {
-			serviceType, err := git.GetGitServiceType("http://github.com/test")
+			serviceType, errz := git.GetGitServiceType("http://github.com/test")
+			err := *errz
 			Expect(serviceType).Should(BeNil(), "service type should be 'nil'")
-			Expect(err.StatusCode).Should(BeEquivalentTo(http.StatusBadRequest), "service type should be '400'")
+			Expect(err.Error()).Should(BeEquivalentTo(github.ErrUnsupportedGithubURL.Error()), "service type should be '400'")
 		})
 
 		It("Correct url - non-existent", func() {

@@ -45,20 +45,20 @@ const (
 )
 
 var (
-	// ErrInternalServerErrorFailedContentRetrieval to return if unable to get contents.
-	ErrInternalServerErrorFailedContentRetrieval = errors.New("unable to retrieve contents")
+	// ErrFailedContentRetrieval to return if unable to get contents.
+	ErrFailedContentRetrieval = errors.New("unable to retrieve contents")
 
-	// ErrInternalServerErrorUnsupportedGithubURL BadRequest github url is invalid.
-	ErrInternalServerErrorUnsupportedGithubURL = errors.New("unsupported github url")
+	// ErrUnsupportedGithubURL BadRequest github url is invalid.
+	ErrUnsupportedGithubURL = errors.New("unsupported github url")
 
-	// ErrBadRequestInvalidPath BadRequest github url is invalid.
-	ErrBadRequestInvalidPath = errors.New("url is invalid")
+	// ErrInvalidPath github url is invalid.
+	ErrInvalidPath = errors.New("url is invalid")
 
-	// ErrInternalServerErrorUnsupportedService git service unsupported.
-	ErrInternalServerErrorUnsupportedService = errors.New("unsupported service")
+	// ErrUnsupportedService git service unsupported.
+	ErrUnsupportedService = errors.New("unsupported service")
 
-	// ErrNotFoundResource no resource found.
-	ErrNotFoundResource = errors.New("resource not found")
+	// ErrResourceNotFound no resource found.
+	ErrResourceNotFound = errors.New("resource not found")
 
 	// ErrFatalMissingGHAttributes github client id and github client secret are unavailable
 	ErrFatalMissingGHAttributes = errors.New("github client id and github client secret are unavailable")
@@ -76,27 +76,27 @@ type GitService struct {
 }
 
 // GetContents gets the contents for the service.
-func (g GitService) GetContents(ctx context.Context, rawURL string, branchName *string) (*string, *errs.HTTPTypeError) {
+func (g GitService) GetContents(ctx context.Context, rawURL string, branchName *string) (*string, *error) {
 	// GetAttributes returns a BadRequest error and
 	// will print the error to the user.
 	u, err := url.Parse(rawURL)
 	if err != nil {
-		return nil, errs.ErrBadRequest(ErrBadRequestInvalidPath)
+		return nil, &ErrInvalidPath
 	}
 
 	urlSegments := strings.Split(u.Path, slash)
-	serviceAttribute, httpTypeError := getServiceAttributes(urlSegments, branchName)
-	if httpTypeError != nil {
-		return nil, httpTypeError
+	serviceAttribute, errs := getServiceAttributes(urlSegments, branchName)
+	if err != nil {
+		return nil, errs
 	}
 
 	// getGithubRepositoryPom returns an
 	// InternalServerError and will print
 	// the buildTool as unknown.
 	buildTool := buildtype.UNKNOWN
-	_, httpTypeError = isMaven(ctx, g, serviceAttribute)
-	if httpTypeError != nil {
-		return &buildTool, httpTypeError
+	_, errs = isMaven(ctx, g, serviceAttribute)
+	if errs != nil {
+		return &buildTool, errs
 	}
 
 	// Reset the buildToolType to maven since
@@ -111,7 +111,7 @@ func (g GitService) GetContents(ctx context.Context, rawURL string, branchName *
 // struct. The attributes struct will be used
 // to make a request to github to determine
 // the build tool type.
-func getServiceAttributes(segments []string, ctxBranch *string) (requestAttributes, *errs.HTTPTypeError) {
+func getServiceAttributes(segments []string, ctxBranch *string) (requestAttributes, *error) {
 
 	var requestAttrs requestAttributes
 
@@ -121,7 +121,7 @@ func getServiceAttributes(segments []string, ctxBranch *string) (requestAttribut
 	branch := master
 
 	if len(segments) <= 2 {
-		return requestAttrs, errs.ErrBadRequest(ErrBadRequestInvalidPath)
+		return requestAttrs, &ErrInvalidPath
 	}
 
 	// If the query parameter field 'branch' is not
@@ -147,7 +147,7 @@ func getServiceAttributes(segments []string, ctxBranch *string) (requestAttribut
 	return requestAttrs, nil
 }
 
-func isMaven(ctx context.Context, ghService GitService, requestAttrs requestAttributes) (bool, *errs.HTTPTypeError) {
+func isMaven(ctx context.Context, ghService GitService, requestAttrs requestAttributes) (bool, *error) {
 
 	// Get the github client id and github client
 	// secret if set to get better rate limits.
@@ -169,7 +169,7 @@ func isMaven(ctx context.Context, ghService GitService, requestAttrs requestAttr
 	// Check that the repository + branch exists first.
 	_, _, err := client.Repositories.GetBranch(ctx, requestAttrs.Owner, requestAttrs.Repository, requestAttrs.Branch)
 	if err != nil {
-		return false, errs.ErrNotFoundError(ErrNotFoundResource)
+		return false, &ErrResourceNotFound
 	}
 
 	// If the repository and branch exists, get the contents for the repository.
@@ -179,7 +179,7 @@ func isMaven(ctx context.Context, ghService GitService, requestAttrs requestAttr
 		pom,
 		&github.RepositoryContentGetOptions{Ref: requestAttrs.Branch})
 	if err != nil && resp.StatusCode != http.StatusOK {
-		return false, errs.ErrInternalServerError(ErrInternalServerErrorFailedContentRetrieval)
+		return false, &ErrFailedContentRetrieval
 	}
 	return true, nil
 }
