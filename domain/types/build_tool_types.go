@@ -1,6 +1,6 @@
 /*
 
-Package buildtype implements a simple way to
+Package types implements a simple way to
 create a GoaBuildToolDetector struct with
 the recognized build type.
 
@@ -21,18 +21,18 @@ in the following JSON response:
 		}
 
 */
-package buildtype
+package types
 
 import (
 	"github.com/tinakurian/build-tool-detector/app"
 )
 
 const (
-	// MAVEN build type detected Maven.
-	MAVEN = "maven"
+	// MavenBuild build type detected Maven.
+	MavenBuild = "maven"
 
-	// UNKNOWN build type detected Unknown.
-	UNKNOWN = "unknown"
+	// UnknownBuild build type detected Unknown.
+	UnknownBuild = "unknown"
 )
 
 // Maven will create a buildToolDetector
@@ -40,7 +40,7 @@ const (
 // to maven.
 func Maven() *app.GoaBuildToolDetector {
 	return &app.GoaBuildToolDetector{
-		BuildToolType: MAVEN,
+		BuildToolType: MavenBuild,
 	}
 }
 
@@ -49,6 +49,6 @@ func Maven() *app.GoaBuildToolDetector {
 // to unknown.
 func Unknown() *app.GoaBuildToolDetector {
 	return &app.GoaBuildToolDetector{
-		BuildToolType: UNKNOWN,
+		BuildToolType: UnknownBuild,
 	}
 }

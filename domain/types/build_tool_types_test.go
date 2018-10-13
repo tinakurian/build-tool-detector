@@ -4,13 +4,13 @@ Package buildtype_test tests
 the buildtype package.
 
 */
-package buildtype_test
+package types_test
 
 import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
-	. "github.com/tinakurian/build-tool-detector/domain/buildtype"
+	. "github.com/tinakurian/build-tool-detector/domain/types"
 )
 
 var _ = Describe("BuildToolType", func() {
