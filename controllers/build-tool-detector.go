@@ -18,8 +18,8 @@ import (
 	errs "github.com/tinakurian/build-tool-detector/controllers/error"
 	"github.com/tinakurian/build-tool-detector/domain/repository"
 	"github.com/tinakurian/build-tool-detector/domain/repository/github"
-	"github.com/tinakurian/build-tool-detector/log"
 	"github.com/tinakurian/build-tool-detector/domain/types"
+	"github.com/tinakurian/build-tool-detector/log"
 )
 
 var (
@@ -54,7 +54,7 @@ func (c *BuildToolDetectorController) Show(ctx *app.ShowBuildToolDetectorContext
 	rawURL := ctx.URL
 	// TODO Here's what I think we can do
 	// - create a service called BuildToolDetector which will take repository service as a collaborator
-	// - exposes simple method Detect (need to figure out what kind of params are really needed) which returns BuildTyp
+	// - exposes simple method Detect (need to figure out what kind of params are really needed) which returns BuildType
 	//   - the idea is that RepositoryService interacts on GH API level
 	//   - build-related logic will sit in this new service
 	//   - so we don't mix two layers of abstraction in one place
