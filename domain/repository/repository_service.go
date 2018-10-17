@@ -15,15 +15,20 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/tinakurian/build-tool-detector/domain/repository/github"
 	"context"
+
+	"github.com/tinakurian/build-tool-detector/domain/repository/github"
+)
+
+const (
+	slash      = "/"
+	githubHost = "github.com"
 )
 
 // Service service interface.
 type Service interface {
-	GetContents(ctx context.Context, rawURL string, branchName *string) (*string, error)
+	DetectBuildTool(ctx context.Context) (*string, error)
 }
-
 
 // CreateService performs a simple url parse and split
 // in order to retrieve the owner, repository
@@ -31,7 +36,7 @@ type Service interface {
 //
 // Note: This method will likely need to be enhanced
 // to handle different github url formats.
-func CreateService(urlToParse string) (Service, error) {
+func CreateService(urlToParse string, branch *string, ghClientID string, ghClientSecret string) (Service, error) {
 
 	u, err := url.Parse(urlToParse)
 
@@ -41,14 +46,14 @@ func CreateService(urlToParse string) (Service, error) {
 	}
 
 	// Currently only support Github.
-	if u.Host != "github.com" {
+	if u.Host != githubHost {
 		return nil, github.ErrUnsupportedService
 	}
 
-	urlSegments := strings.Split(u.Path, "/")
+	urlSegments := strings.Split(u.Path, slash)
 	if len(urlSegments) < 3 {
 		return nil, github.ErrUnsupportedGithubURL
 	}
 
-	return github.Create(), nil
+	return github.Create(urlSegments, branch, ghClientID, ghClientSecret)
 }

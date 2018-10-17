@@ -6,4 +6,3 @@ type Repository struct {
 	Repository string
 	Branch     string
 }
-

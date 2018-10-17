@@ -13,8 +13,6 @@ import (
 	"context"
 	"errors"
 	"net/http"
-	"net/url"
-	"strings"
 
 	"github.com/google/go-github/github"
 	"github.com/tinakurian/build-tool-detector/domain/types"
@@ -31,7 +29,6 @@ const (
 const (
 	master = "master"
 	tree   = "tree"
-	slash  = "/"
 	pom    = "pom.xml"
 )
 
@@ -59,34 +56,25 @@ var (
 type Service struct {
 	ClientID     string
 	ClientSecret string
+	repository   types.Repository
 }
 
 // Create instantiate Github repository
-func Create() *Service {
-	// TODO figure out from where this needs to be fetched - maybe we construct it differently somewhere else - this is just an idea
-	return &Service{ClientID: "need-to-pass-it", ClientSecret: "need-to-pass-it-too"}
+func Create(segment []string, branch *string, ghClientID string, ghClientSecret string) (*Service, error) {
+	repo, err := getServiceAttributes(segment, branch)
+	if err != nil {
+		return nil, err
+	}
+	return &Service{ClientID: ghClientID, ClientSecret: ghClientSecret, repository: repo}, nil
 }
 
-// GetContents gets the contents for the service.
-func (g Service) GetContents(ctx context.Context, rawURL string, branchName *string) (*string, error) {
-	// GetAttributes returns a BadRequest error and
-	// will print the error to the user.
-	u, err := url.Parse(rawURL)
-	if err != nil {
-		return nil, ErrInvalidPath
-	}
-
-	urlSegments := strings.Split(u.Path, slash)
-	serviceAttribute, errs := getServiceAttributes(urlSegments, branchName)
-	if err != nil {
-		return nil, errs
-	}
-
+// DetectBuildTool gets the contents for the service.
+func (g Service) DetectBuildTool(ctx context.Context) (*string, error) {
 	// getGithubRepositoryPom returns an
 	// InternalServerError and will print
 	// the buildTool as unknown.
 	buildTool := types.UnknownBuild
-	_, errs = isMaven(ctx, g, serviceAttribute)
+	_, errs := getContents(ctx, g)
 	if errs != nil {
 		return &buildTool, errs
 	}
@@ -139,7 +127,7 @@ func getServiceAttributes(segments []string, ctxBranch *string) (types.Repositor
 	return requestAttrs, nil
 }
 
-func isMaven(ctx context.Context, ghService Service, requestAttrs types.Repository) (bool, error) {
+func getContents(ctx context.Context, ghService Service) (bool, error) {
 
 	// Get the github client id and github client
 	// secret if set to get better rate limits.
@@ -159,17 +147,17 @@ func isMaven(ctx context.Context, ghService Service, requestAttrs types.Reposito
 	}
 
 	// Check that the repository + branch exists first.
-	_, _, err := client.Repositories.GetBranch(ctx, requestAttrs.Owner, requestAttrs.Repository, requestAttrs.Branch)
+	_, _, err := client.Repositories.GetBranch(ctx, ghService.repository.Owner, ghService.repository.Repository, ghService.repository.Branch)
 	if err != nil {
 		return false, ErrResourceNotFound
 	}
 
 	// If the repository and branch exists, get the contents for the repository.
 	_, _, resp, err := client.Repositories.GetContents(
-		ctx, requestAttrs.Owner,
-		requestAttrs.Repository,
+		ctx, ghService.repository.Owner,
+		ghService.repository.Repository,
 		pom,
-		&github.RepositoryContentGetOptions{Ref: requestAttrs.Branch})
+		&github.RepositoryContentGetOptions{Ref: ghService.repository.Branch})
 	if err != nil && resp.StatusCode != http.StatusOK {
 		return false, ErrFailedContentRetrieval
 	}

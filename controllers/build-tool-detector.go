@@ -59,14 +59,13 @@ func (c *BuildToolDetectorController) Show(ctx *app.ShowBuildToolDetectorContext
 	//   - build-related logic will sit in this new service
 	//   - so we don't mix two layers of abstraction in one place
 	// In here simple orchestration only should reside
-	repositoryService, err := repository.CreateService(rawURL)
+	repositoryService, err := repository.CreateService(rawURL, ctx.Branch, c.ghClientID, c.ghClientSecret)
+	ctx.ResponseWriter.Header().Set(contentType, applicationJSON)
 	if err != nil {
 		return handleError(ctx, err)
 	}
 
-	ctx.ResponseWriter.Header().Set(contentType, applicationJSON)
-	// TODO  This call goes away in favor of Detect()
-	buildToolType, err := repositoryService.GetContents(ctx.Context, rawURL, ctx.Branch)
+	buildToolType, err := repositoryService.DetectBuildTool(ctx.Context)
 	if err != nil {
 		return handleError(ctx, err)
 	}
