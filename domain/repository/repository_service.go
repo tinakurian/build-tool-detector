@@ -15,15 +15,15 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/tinakurian/build-tool-detector/domain/repository/github"
 	"context"
+
+	"github.com/tinakurian/build-tool-detector/domain/repository/github"
 )
 
 // Service service interface.
 type Service interface {
 	GetContents(ctx context.Context, rawURL string, branchName *string) (*string, error)
 }
-
 
 // CreateService performs a simple url parse and split
 // in order to retrieve the owner, repository

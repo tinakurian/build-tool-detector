@@ -18,8 +18,8 @@ import (
 	errs "github.com/tinakurian/build-tool-detector/controllers/error"
 	"github.com/tinakurian/build-tool-detector/domain/repository"
 	"github.com/tinakurian/build-tool-detector/domain/repository/github"
-	"github.com/tinakurian/build-tool-detector/log"
 	"github.com/tinakurian/build-tool-detector/domain/types"
+	"github.com/tinakurian/build-tool-detector/log"
 )
 
 var (

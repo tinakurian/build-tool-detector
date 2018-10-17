@@ -9,8 +9,8 @@ package repository_test
 import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/tinakurian/build-tool-detector/domain/repository/github"
 	"github.com/tinakurian/build-tool-detector/domain/repository"
+	"github.com/tinakurian/build-tool-detector/domain/repository/github"
 )
 
 var _ = Describe("GitServiceType", func() {

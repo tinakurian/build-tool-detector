@@ -28,8 +28,18 @@ func main() {
 	app.PersistentFlags().DurationVarP(&httpClient.Timeout, "timeout", "t", time.Duration(20)*time.Second, "Set the request timeout")
 	app.PersistentFlags().BoolVar(&c.Dump, "dump", false, "Dump HTTP request and response.")
 
+	// Register signer flags
+	var key, format string
+	app.PersistentFlags().StringVar(&key, "key", "", "API key used for authentication")
+	app.PersistentFlags().StringVar(&format, "format", "Bearer %s", "Format used to create auth header or query from key")
+
+	// Parse flags and setup signers
+	app.ParseFlags(os.Args)
+	jwtSigner := newJWTSigner(key, format)
+
 	// Initialize API client
-	c.UserAgent = "build-tool-detector-cli/0"
+	c.SetJWTSigner(jwtSigner)
+	c.UserAgent = "build-tool-detector-cli/1.0"
 
 	// Register API commands
 	cli.RegisterCommands(app, c)
@@ -46,4 +56,16 @@ func newHTTPClient() *http.Client {
 	// TBD: Change as needed (e.g. to use a different transport to control redirection policy or
 	// disable cert validation or...)
 	return http.DefaultClient
+}
+
+// newJWTSigner returns the request signer used for authenticating
+// against the jwt security scheme.
+func newJWTSigner(key, format string) goaclient.Signer {
+	return &goaclient.APIKeySigner{
+		SignQuery: false,
+		KeyName:   "Authorization",
+		KeyValue:  key,
+		Format:    format,
+	}
+
 }
