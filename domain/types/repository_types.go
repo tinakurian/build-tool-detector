@@ -4,8 +4,7 @@ import (
 	"context"
 )
 
-// RepositoryService holds information about
-// the repository
+// RepositoryService holds information about the repo
 type RepositoryService interface {
 	Owner() string
 	Repository() string

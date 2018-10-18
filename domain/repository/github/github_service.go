@@ -147,6 +147,7 @@ func newRepository(segments []string, ctxBranch *string, ghClientID string, ghCl
 // getContents creates a client and
 // initiates making requests to github.
 func getContents(ctx context.Context, repository githubRepository) result {
+
 	// Get the github client id and github client
 	// secret if set to get better rate limits.
 	t := github.UnauthenticatedRateLimitedTransport{
@@ -165,7 +166,6 @@ func getContents(ctx context.Context, repository githubRepository) result {
 			Fatalf(ErrFatalMissingGHAttributes.Error())
 	}
 
-	// Check that the repository + branch exists first.
 	_, err := getBranchRequest(ctx, client, repository)
 	if err != nil {
 		return result{nil, nil, err}
