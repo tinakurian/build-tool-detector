@@ -148,14 +148,9 @@ func isMaven(ctx context.Context, ghService Service, requestAttrs types.Reposito
 		ClientSecret: ghService.ClientSecret,
 	}
 
-	log.Logger().Print(ghService.ClientID)
-	log.Logger().Print(ghService.ClientSecret)
-
 	// If the github client id or github client
 	// secret are empty, we will log and fail.
 	client := github.NewClient(t.Client())
-	log.Logger().Print(t.ClientID)
-	log.Logger().Print(t.ClientSecret)
 
 	if t.ClientID == "" || t.ClientSecret == "" {
 		log.Logger().
