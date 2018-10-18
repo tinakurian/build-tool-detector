@@ -9,5 +9,5 @@ import (
 
 func TestBuildtype(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Buildtype Suite")
+	RunSpecs(t, "Types Suite")
 }

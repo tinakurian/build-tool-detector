@@ -52,13 +52,6 @@ func NewBuildToolDetectorController(service *goa.Service, ghClientID string, ghC
 // Show runs the show action.
 func (c *BuildToolDetectorController) Show(ctx *app.ShowBuildToolDetectorContext) error {
 	rawURL := ctx.URL
-	// TODO Here's what I think we can do
-	// - create a service called BuildToolDetector which will take repository service as a collaborator
-	// - exposes simple method Detect (need to figure out what kind of params are really needed) which returns BuildType
-	//   - the idea is that RepositoryService interacts on GH API level
-	//   - build-related logic will sit in this new service
-	//   - so we don't mix two layers of abstraction in one place
-	// In here simple orchestration only should reside
 	repositoryService, err := repository.CreateService(rawURL, ctx.Branch, c.ghClientID, c.ghClientSecret)
 	ctx.ResponseWriter.Header().Set(contentType, applicationJSON)
 	if err != nil {
@@ -94,7 +87,7 @@ func handleError(ctx *app.ShowBuildToolDetectorContext, err error) error {
 			return writerErr
 		}
 		return ctx.NotFound()
-	case github.ErrUnsupportedService.Error(),
+	case repository.ErrUnsupportedService.Error(),
 		github.ErrUnsupportedGithubURL.Error():
 		httpError := errs.ErrInternalServerError(err)
 		writerErr := formatResponse(ctx, httpError)
