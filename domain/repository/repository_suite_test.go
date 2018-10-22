@@ -15,5 +15,5 @@ import (
 
 func TestGit(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Git Suite")
+	RunSpecs(t, "Repository Suite")
 }

@@ -12,12 +12,17 @@ maven.
 package repository
 
 import (
+	"errors"
 	"net/url"
 	"strings"
 
-	"context"
-
 	"github.com/tinakurian/build-tool-detector/domain/repository/github"
+	"github.com/tinakurian/build-tool-detector/domain/types"
+)
+
+var (
+	// ErrUnsupportedService git service unsupported.
+	ErrUnsupportedService = errors.New("unsupported service")
 )
 
 const (
@@ -25,18 +30,13 @@ const (
 	githubHost = "github.com"
 )
 
-// Service service interface.
-type Service interface {
-	DetectBuildTool(ctx context.Context) (*string, error)
-}
-
 // CreateService performs a simple url parse and split
 // in order to retrieve the owner, repository
 // and potentially the branch.
 //
 // Note: This method will likely need to be enhanced
 // to handle different github url formats.
-func CreateService(urlToParse string, branch *string, ghClientID string, ghClientSecret string) (Service, error) {
+func CreateService(urlToParse string, branch *string, ghClientID string, ghClientSecret string) (types.RepositoryService, error) {
 
 	u, err := url.Parse(urlToParse)
 
@@ -47,7 +47,7 @@ func CreateService(urlToParse string, branch *string, ghClientID string, ghClien
 
 	// Currently only support Github.
 	if u.Host != githubHost {
-		return nil, github.ErrUnsupportedService
+		return nil, ErrUnsupportedService
 	}
 
 	urlSegments := strings.Split(u.Path, slash)

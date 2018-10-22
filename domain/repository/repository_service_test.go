@@ -30,7 +30,7 @@ var _ = Describe("GitServiceType", func() {
 		It("Faulty Host - not github.com", func() {
 			serviceType, err := repository.CreateService("http://test.com/test/test", nil, "", "")
 			Expect(serviceType).Should(BeNil(), "service type should be 'nil'")
-			Expect(err.Error()).Should(BeEquivalentTo(github.ErrUnsupportedService.Error()), "service type should be '500'")
+			Expect(err.Error()).Should(BeEquivalentTo(repository.ErrUnsupportedService.Error()), "service type should be '500'")
 		})
 
 		It("Faulty url - no repository", func() {

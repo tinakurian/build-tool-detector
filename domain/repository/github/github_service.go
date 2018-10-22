@@ -20,16 +20,15 @@ import (
 )
 
 const (
-	// ClientID github client id
+	// ClientID github client id.
 	ClientID = "GH_CLIENT_ID"
 
-	// ClientSecret github client secret
+	// ClientSecret github client secret.
 	ClientSecret = "GH_CLIENT_SECRET"
 )
 const (
 	master = "master"
 	tree   = "tree"
-	pom    = "pom.xml"
 )
 
 var (
@@ -42,58 +41,74 @@ var (
 	// ErrInvalidPath github url is invalid.
 	ErrInvalidPath = errors.New("url is invalid")
 
-	// ErrUnsupportedService git service unsupported.
-	ErrUnsupportedService = errors.New("unsupported service")
-
 	// ErrResourceNotFound no resource found.
 	ErrResourceNotFound = errors.New("resource not found")
 
-	// ErrFatalMissingGHAttributes github client id and github client secret are unavailable
+	// ErrFatalMissingGHAttributes github client id and github client secret are unavailable.
 	ErrFatalMissingGHAttributes = errors.New("github client id and github client secret are unavailable")
 )
 
-// Service struct.
-type Service struct {
-	ClientID     string
-	ClientSecret string
-	repository   types.Repository
+// RepositoryService contains
+// values pertaining to a github
+// repository.
+type githubRepository struct {
+	owner        string
+	repository   string
+	branch       string
+	clientID     string
+	clientSecret string
+}
+
+// result used to send results to
+// the result channel.
+type result struct {
+	typeInfo *types.BuildType
+	res      *github.Response
+	err      error
 }
 
 // Create instantiate Github repository
-func Create(segment []string, branch *string, ghClientID string, ghClientSecret string) (*Service, error) {
-	repo, err := getServiceAttributes(segment, branch)
-	if err != nil {
-		return nil, err
-	}
-	return &Service{ClientID: ghClientID, ClientSecret: ghClientSecret, repository: repo}, nil
+func Create(segment []string, branch *string, ghClientID string, ghClientSecret string) (types.RepositoryService, error) {
+	return newRepository(segment, branch, ghClientID, ghClientSecret)
 }
 
 // DetectBuildTool gets the contents for the service.
-func (g Service) DetectBuildTool(ctx context.Context) (*string, error) {
+func (g githubRepository) DetectBuildTool(ctx context.Context) (*string, error) {
 	// getGithubRepositoryPom returns an
 	// InternalServerError and will print
 	// the buildTool as unknown.
-	buildTool := types.UnknownBuild
-	_, errs := getContents(ctx, g)
-	if errs != nil {
-		return &buildTool, errs
+	buildTool := types.Unknown
+	results := getContents(ctx, g)
+	if results.err != nil {
+		return &buildTool, results.err
 	}
 
-	// Reset the buildToolType to maven since
-	// the pom.xml was retrievable.
-	buildTool = types.MavenBuild
-
-	return &buildTool, nil
+	return &results.typeInfo.BuildType, nil
 }
 
-// getServiceAttributes will use the path segments and
+// Owner returns the owner of a repository.
+func (g githubRepository) Owner() string {
+	return g.owner
+}
+
+// Repository returns the repository of a repository.
+func (g githubRepository) Repository() string {
+	return g.repository
+}
+
+// Branch returns the repository of a repository.
+func (g githubRepository) Branch() string {
+	return g.branch
+}
+
+// newRepository will use the path segments and
 // query params to populate the Attributes
 // struct. The attributes struct will be used
 // to make a request to github to determine
 // the build tool type.
-func getServiceAttributes(segments []string, ctxBranch *string) (types.Repository, error) {
+func newRepository(segments []string, ctxBranch *string, ghClientID string, ghClientSecret string) (types.RepositoryService, error) {
 
-	var requestAttrs types.Repository
+	var repositoryService types.RepositoryService
 
 	// Default branch that will be used if a branch
 	// is not passed in though the optional 'branch'
@@ -101,7 +116,7 @@ func getServiceAttributes(segments []string, ctxBranch *string) (types.Repositor
 	branch := master
 
 	if len(segments) <= 2 {
-		return requestAttrs, ErrInvalidPath
+		return repositoryService, ErrInvalidPath
 	}
 
 	// If the query parameter field 'branch' is not
@@ -118,22 +133,25 @@ func getServiceAttributes(segments []string, ctxBranch *string) (types.Repositor
 		}
 	}
 
-	requestAttrs = types.Repository{
-		Owner:      segments[1],
-		Repository: segments[2],
-		Branch:     branch,
+	repositoryService = githubRepository{
+		owner:        segments[1],
+		repository:   segments[2],
+		branch:       branch,
+		clientID:     ghClientID,
+		clientSecret: ghClientSecret,
 	}
 
-	return requestAttrs, nil
+	return repositoryService, nil
 }
 
-func getContents(ctx context.Context, ghService Service) (bool, error) {
-
+// getContents creates a client and
+// initiates making requests to github.
+func getContents(ctx context.Context, repository githubRepository) result {
 	// Get the github client id and github client
 	// secret if set to get better rate limits.
 	t := github.UnauthenticatedRateLimitedTransport{
-		ClientID:     ghService.ClientID,
-		ClientSecret: ghService.ClientSecret,
+		ClientID:     repository.clientID,
+		ClientSecret: repository.clientSecret,
 	}
 
 	// If the github client id or github client
@@ -148,19 +166,64 @@ func getContents(ctx context.Context, ghService Service) (bool, error) {
 	}
 
 	// Check that the repository + branch exists first.
-	_, _, err := client.Repositories.GetBranch(ctx, ghService.repository.Owner, ghService.repository.Repository, ghService.repository.Branch)
+	_, err := getBranchRequest(ctx, client, repository)
+	if err != nil {
+		return result{nil, nil, err}
+	}
+
+	// Parallel get requests.
+	results := getContentsRequest(ctx, types.GetTypes(), client, repository)
+	for _, result := range results {
+		if result.res != nil {
+			if result.res.StatusCode == http.StatusOK {
+				return result
+			}
+		}
+	}
+
+	return result{nil, nil, ErrFailedContentRetrieval}
+}
+
+// getBranchRequest makes a request
+// to ensure the repository and
+// branch are valid.
+func getBranchRequest(ctx context.Context, client *github.Client, repository githubRepository) (bool, error) {
+	_, _, err := client.Repositories.GetBranch(ctx, repository.owner, repository.repository, repository.branch)
 	if err != nil {
 		return false, ErrResourceNotFound
 	}
 
-	// If the repository and branch exists, get the contents for the repository.
-	_, _, resp, err := client.Repositories.GetContents(
-		ctx, ghService.repository.Owner,
-		ghService.repository.Repository,
-		pom,
-		&github.RepositoryContentGetOptions{Ref: ghService.repository.Branch})
-	if err != nil && resp.StatusCode != http.StatusOK {
-		return false, ErrFailedContentRetrieval
-	}
 	return true, nil
+}
+
+// getContentsRequest makes parellel requests
+// and sends the results through a results channel.
+func getContentsRequest(ctx context.Context, buildTypes []types.BuildType, client *github.Client, repository githubRepository) []result {
+	resultsChannel := make(chan result)
+	defer func() {
+		close(resultsChannel)
+	}()
+
+	for _, buildType := range buildTypes {
+		go func(buildType types.BuildType) {
+			_, _, resp, err := client.Repositories.GetContents(
+				ctx, repository.owner,
+				repository.repository,
+				buildType.File,
+				&github.RepositoryContentGetOptions{Ref: repository.branch})
+			resultsChannel <- result{&buildType, resp, err}
+		}(buildType)
+	}
+
+	var results []result
+	for {
+		result := <-resultsChannel
+		results = append(results, result)
+
+		// if we've reached the expected amount of urls then stop
+		if len(results) == len(buildTypes) {
+			break
+		}
+	}
+	return results
 }
