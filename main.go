@@ -75,7 +75,7 @@ func main() {
 		}, "failed to create token manager")
 	}
 	// Middleware that extracts and stores the token in the context
-	jwtMiddlewareTokenContext := goamiddleware.TokenContext(tokenManager, nil, app.NewJWTSecurity())
+	jwtMiddlewareTokenContext := goamiddleware.TokenContext(tokenManager, app.NewJWTSecurity())
 	service.Use(jwtMiddlewareTokenContext)
 
 	service.Use(token.InjectTokenManager(tokenManager))
