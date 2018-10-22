@@ -13,10 +13,11 @@ package repository
 
 import (
 	"errors"
-	"github.com/tinakurian/build-tool-detector/domain/repository/github"
-	"github.com/tinakurian/build-tool-detector/domain/types"
 	"net/url"
 	"strings"
+
+	"github.com/tinakurian/build-tool-detector/domain/repository/github"
+	"github.com/tinakurian/build-tool-detector/domain/types"
 )
 
 var (

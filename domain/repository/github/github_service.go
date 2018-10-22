@@ -20,16 +20,15 @@ import (
 )
 
 const (
-	// ClientID github client id
+	// ClientID github client id.
 	ClientID = "GH_CLIENT_ID"
 
-	// ClientSecret github client secret
+	// ClientSecret github client secret.
 	ClientSecret = "GH_CLIENT_SECRET"
 )
 const (
 	master = "master"
 	tree   = "tree"
-	pom    = "pom.xml"
 )
 
 var (
@@ -45,17 +44,27 @@ var (
 	// ErrResourceNotFound no resource found.
 	ErrResourceNotFound = errors.New("resource not found")
 
-	// ErrFatalMissingGHAttributes github client id and github client secret are unavailable
+	// ErrFatalMissingGHAttributes github client id and github client secret are unavailable.
 	ErrFatalMissingGHAttributes = errors.New("github client id and github client secret are unavailable")
 )
 
-// RepositoryService todo
+// RepositoryService contains
+// values pertaining to a github
+// repository.
 type githubRepository struct {
 	owner        string
 	repository   string
 	branch       string
 	clientID     string
 	clientSecret string
+}
+
+// result used to send results to
+// the result channel.
+type result struct {
+	typeInfo *types.BuildType
+	res      *github.Response
+	err      error
 }
 
 // Create instantiate Github repository
@@ -68,27 +77,26 @@ func (g githubRepository) DetectBuildTool(ctx context.Context) (*string, error) 
 	// getGithubRepositoryPom returns an
 	// InternalServerError and will print
 	// the buildTool as unknown.
-	buildTool := types.UnknownBuild
-	_, errs := getContents(ctx, g)
-	if errs != nil {
-		return &buildTool, errs
+	buildTool := types.Unknown
+	results := getContents(ctx, g)
+	if results.err != nil {
+		return &buildTool, results.err
 	}
 
-	// Reset the buildToolType to maven since
-	// the pom.xml was retrievable.
-	buildTool = types.MavenBuild
-
-	return &buildTool, nil
+	return &results.typeInfo.BuildType, nil
 }
 
+// Owner returns the owner of a repository.
 func (g githubRepository) Owner() string {
 	return g.owner
 }
 
+// Repository returns the repository of a repository.
 func (g githubRepository) Repository() string {
 	return g.repository
 }
 
+// Branch returns the repository of a repository.
 func (g githubRepository) Branch() string {
 	return g.branch
 }
@@ -136,7 +144,9 @@ func newRepository(segments []string, ctxBranch *string, ghClientID string, ghCl
 	return repositoryService, nil
 }
 
-func getContents(ctx context.Context, repository githubRepository) (bool, error) {
+// getContents creates a client and
+// initiates making requests to github.
+func getContents(ctx context.Context, repository githubRepository) result {
 
 	// Get the github client id and github client
 	// secret if set to get better rate limits.
@@ -155,20 +165,64 @@ func getContents(ctx context.Context, repository githubRepository) (bool, error)
 			Fatalf(ErrFatalMissingGHAttributes.Error())
 	}
 
-	// Check that the repository + branch exists first.
+	_, err := getBranchRequest(ctx, client, repository)
+	if err != nil {
+		return result{nil, nil, err}
+	}
+
+	// Parallel get requests.
+	results := getContentsRequest(ctx, types.GetTypes(), client, repository)
+	for _, result := range results {
+		if result.res != nil {
+			if result.res.StatusCode == http.StatusOK {
+				return result
+			}
+		}
+	}
+
+	return result{nil, nil, ErrFailedContentRetrieval}
+}
+
+// getBranchRequest makes a request
+// to ensure the repository and
+// branch are valid.
+func getBranchRequest(ctx context.Context, client *github.Client, repository githubRepository) (bool, error) {
 	_, _, err := client.Repositories.GetBranch(ctx, repository.owner, repository.repository, repository.branch)
 	if err != nil {
 		return false, ErrResourceNotFound
 	}
 
-	// If the repository and branch exists, get the contents for the repository.
-	_, _, resp, err := client.Repositories.GetContents(
-		ctx, repository.owner,
-		repository.repository,
-		pom,
-		&github.RepositoryContentGetOptions{Ref: repository.branch})
-	if err != nil && resp.StatusCode != http.StatusOK {
-		return false, ErrFailedContentRetrieval
-	}
 	return true, nil
+}
+
+// getContentsRequest makes parellel requests
+// and sends the results through a results channel.
+func getContentsRequest(ctx context.Context, buildTypes []types.BuildType, client *github.Client, repository githubRepository) []result {
+	resultsChannel := make(chan result)
+	defer func() {
+		close(resultsChannel)
+	}()
+
+	for _, buildType := range buildTypes {
+		go func(buildType types.BuildType) {
+			_, _, resp, err := client.Repositories.GetContents(
+				ctx, repository.owner,
+				repository.repository,
+				buildType.File,
+				&github.RepositoryContentGetOptions{Ref: repository.branch})
+			resultsChannel <- result{&buildType, resp, err}
+		}(buildType)
+	}
+
+	var results []result
+	for {
+		result := <-resultsChannel
+		results = append(results, result)
+
+		// if we've reached the expected amount of urls then stop
+		if len(results) == len(buildTypes) {
+			break
+		}
+	}
+	return results
 }

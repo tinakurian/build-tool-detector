@@ -26,7 +26,7 @@ var (
 	// ErrFailedJSONMarshal unable to marshal json.
 	ErrFailedJSONMarshal = errors.New("unable to marshal json")
 
-	// ErrFailedPropagate unable to propagate error
+	// ErrFailedPropagate unable to propagate error.
 	ErrFailedPropagate = errors.New("unable to propagate error")
 )
 
@@ -63,14 +63,27 @@ func (c *BuildToolDetectorController) Show(ctx *app.ShowBuildToolDetectorContext
 		return handleError(ctx, err)
 	}
 
-	buildTool := types.Unknown()
-	if types.MavenBuild == *buildToolType {
-		buildTool = types.Maven()
-	}
+	buildTool := handleSuccess(*buildToolType)
 	return ctx.OK(buildTool)
-
 }
 
+// handleSuccess handles returning
+// the correct json for 200 OK responses.
+func handleSuccess(buildToolType string) *app.GoaBuildToolDetector {
+	switch buildToolType {
+	case types.Maven:
+		return types.NewMaven()
+	case types.NodeJS:
+		return types.NewNodeJS()
+	case types.Unknown:
+		return types.NewUnknown()
+	default:
+		return types.NewUnknown()
+	}
+}
+
+// handleError handles returning
+// the correct http responses upon error.
 func handleError(ctx *app.ShowBuildToolDetectorContext, err error) error {
 	switch err.Error() {
 	case github.ErrInvalidPath.Error():
@@ -96,13 +109,15 @@ func handleError(ctx *app.ShowBuildToolDetectorContext, err error) error {
 		}
 		return ctx.InternalServerError()
 	case github.ErrFailedContentRetrieval.Error():
-		buildTool := types.Unknown()
+		buildTool := types.NewUnknown()
 		return ctx.OK(buildTool)
 	default:
 		return ctx.InternalServerError()
 	}
 }
 
+// formatResponse writes the header
+// and formats the response
 func formatResponse(ctx *app.ShowBuildToolDetectorContext, httpTypeError *errs.HTTPTypeError) error {
 	ctx.WriteHeader(httpTypeError.StatusCode)
 	jsonHTTPTypeError, err := json.Marshal(httpTypeError)

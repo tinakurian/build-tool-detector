@@ -28,27 +28,68 @@ import (
 )
 
 const (
-	// MavenBuild build type detected Maven.
-	MavenBuild = "maven"
+	// Maven build type detected Maven.
+	Maven  = "maven"
+	pomXML = "pom.xml"
 
-	// UnknownBuild build type detected Unknown.
-	UnknownBuild = "unknown"
+	// NodeJS build type detected node.
+	NodeJS      = "nodejs"
+	packageJSON = "package.json"
+
+	// Unknown build type detected Unknown.
+	Unknown = "unknown"
 )
 
-// Maven will create a buildToolDetector
+// BuildType TODO
+type BuildType struct {
+	BuildType string
+	File      string
+}
+
+// NewMaven will create a buildToolDetector
 // struct with the BuildToolType set
 // to maven.
-func Maven() *app.GoaBuildToolDetector {
+func NewMaven() *app.GoaBuildToolDetector {
 	return &app.GoaBuildToolDetector{
-		BuildToolType: MavenBuild,
+		BuildToolType: Maven,
 	}
 }
 
-// Unknown will create a buildToolDetector
+// NewNodeJS will create a buildToolDetector
+// struct with the BuildToolType set
+// to NodeJS.
+func NewNodeJS() *app.GoaBuildToolDetector {
+	return &app.GoaBuildToolDetector{
+		BuildToolType: NodeJS,
+	}
+}
+
+// NewUnknown will create a buildToolDetector
 // struct with the BuildToolType set
 // to unknown.
-func Unknown() *app.GoaBuildToolDetector {
+func NewUnknown() *app.GoaBuildToolDetector {
 	return &app.GoaBuildToolDetector{
-		BuildToolType: UnknownBuild,
+		BuildToolType: Unknown,
 	}
+}
+
+// GetTypes returns the BuilType for all
+// supported build tools.
+func GetTypes() []BuildType {
+	buildTypes := make([]BuildType, 2)
+
+	buildTypes[0] = getTypeMaven()
+	buildTypes[1] = getTypeNodeJS()
+
+	return buildTypes
+}
+
+// getTypeMaven returns BuildType for maven.
+func getTypeMaven() BuildType {
+	return BuildType{Maven, pomXML}
+}
+
+// getTypeNodeJS returns BuildType for nodejs.
+func getTypeNodeJS() BuildType {
+	return BuildType{NodeJS, packageJSON}
 }

@@ -16,14 +16,14 @@ import (
 var _ = Describe("BuildToolType", func() {
 	Context("Maven", func() {
 		It("Get Maven", func() {
-			maven := Maven()
+			maven := NewMaven()
 			Expect(maven.BuildToolType).Should(BeEquivalentTo("maven"), "build tool type type should be 'maven'")
 		})
 	})
 
 	Context("Unknown", func() {
 		It("Get Unknown", func() {
-			unknown := Unknown()
+			unknown := NewUnknown()
 			Expect(unknown.BuildToolType).Should(BeEquivalentTo("unknown"), "build tool type should be 'unknown'")
 		})
 	})
