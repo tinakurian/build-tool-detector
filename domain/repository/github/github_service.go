@@ -158,6 +158,7 @@ func getContents(ctx context.Context, repository githubRepository) result {
 	// If the github client id or github client
 	// secret are empty, we will log and fail.
 	client := github.NewClient(t.Client())
+
 	if t.ClientID == "" || t.ClientSecret == "" {
 		log.Logger().
 			WithField(ClientID, t.ClientID).

@@ -17,6 +17,7 @@ var _ = a.Resource("build-tool-detector", func() {
 	a.BasePath("/")
 	a.DefaultMedia(BuildToolDetectorMedia)
 	a.Action("show", func() {
+		a.Security("jwt")
 		a.Description("Detects the build tool for a given repository and branch.")
 		a.Routing(
 			a.GET("/:url"),

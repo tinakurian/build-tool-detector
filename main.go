@@ -7,13 +7,16 @@ import (
 	"flag"
 	"os"
 
+	"github.com/fabric8-services/fabric8-common/goamiddleware"
+	"github.com/fabric8-services/fabric8-common/token"
 	"github.com/goadesign/goa"
 	"github.com/goadesign/goa/middleware"
+	"github.com/goadesign/goa/middleware/security/jwt"
 	"github.com/tinakurian/build-tool-detector/app"
+	"github.com/tinakurian/build-tool-detector/config"
 	"github.com/tinakurian/build-tool-detector/controllers"
 	"github.com/tinakurian/build-tool-detector/domain/repository/github"
 	"github.com/tinakurian/build-tool-detector/log"
-	logorus "github.com/tinakurian/build-tool-detector/log"
 )
 
 var (
@@ -26,7 +29,7 @@ const (
 	errorz            = "err"
 	buildToolDetector = "build-tool-detector"
 	port              = "PORT"
-	defaultPort       = "8080"
+	defaultPort       = "8099"
 )
 
 var (
@@ -34,13 +37,15 @@ var (
 	ghClientID     = flag.String(github.ClientID, "", "Github Client ID")
 	ghClientSecret = flag.String(github.ClientSecret, "", "Github Client Secret")
 	sentryDSN      = flag.String(log.SentryDSN, "", "Sentry DSN")
+	authURL        = flag.String(config.AuthURL, config.AuthURLDefault, "URL to Auth")
 )
 
 func main() {
 
 	flag.Parse()
+
 	if *ghClientID == "" || *ghClientSecret == "" {
-		logorus.Logger().
+		log.Logger().
 			WithField(github.ClientID, ghClientID).
 			WithField(github.ClientSecret, ghClientSecret).
 			Fatalf(github.ErrFatalMissingGHAttributes.Error())
@@ -49,7 +54,7 @@ func main() {
 	// Export Sentry DSN for logging
 	err := os.Setenv(log.BuildToolDetectorSentryDSN, *sentryDSN)
 	if err != nil {
-		logorus.Logger().
+		log.Logger().
 			WithField(log.SentryDSN, sentryDSN).
 			Fatalf(errFatalFailedSettingSentryDSN.Error()+"%v", sentryDSN)
 	}
@@ -62,6 +67,19 @@ func main() {
 	service.Use(middleware.LogRequest(true))
 	service.Use(middleware.ErrorHandler(service, true))
 	service.Use(middleware.Recover())
+
+	tokenManager, err := token.NewManager(&config.AuthConfig{AuthServiceURL: *authURL})
+	if err != nil {
+		log.Logger().Panic(nil, map[string]interface{}{
+			"err": err,
+		}, "failed to create token manager")
+	}
+	// Middleware that extracts and stores the token in the context
+	jwtMiddlewareTokenContext := goamiddleware.TokenContext(tokenManager, app.NewJWTSecurity())
+	service.Use(jwtMiddlewareTokenContext)
+
+	service.Use(token.InjectTokenManager(tokenManager))
+	app.UseJWTMiddleware(service, jwt.New(tokenManager.PublicKeys(), nil, app.NewJWTSecurity()))
 
 	// Mount "build-tool-detector" controller
 	c := controllers.NewBuildToolDetectorController(service, *ghClientID, *ghClientSecret)

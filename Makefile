@@ -3,7 +3,7 @@
 CURRENT_DIR := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 PROJECT_REPO := 'github.com/tinakurian'
 PROJECT_NAME := 'build-tool-detector'
-PORT := '8080'
+PORT := '8099'
 
 .DEFAULT_GOAL := all
 
@@ -65,7 +65,7 @@ format:
 
 .PHONY: check
 check: ## Concurrently runs a whole bunch of static analysis tools
-	@gometalinter --enable=misspell --enable=gosimple --enable-gc --vendor --skip=app --skip=client --skip=tool --deadline 300s ./...
+	@gometalinter --enable=misspell --enable=gosimple --enable-gc --vendor --skip=app --skip=client --skip=tool --exclude ^app/test/ --deadline 300s ./...
 
 .PHONY: run
 run: ## runs the service locally
