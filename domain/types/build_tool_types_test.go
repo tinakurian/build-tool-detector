@@ -27,4 +27,18 @@ var _ = Describe("BuildToolType", func() {
 			Expect(unknown.BuildToolType).Should(BeEquivalentTo("unknown"), "build tool type should be 'unknown'")
 		})
 	})
+
+	Context("GetTypes", func() {
+		It("Get Types", func() {
+			nodejs := NewNodeJS()
+			maven := NewMaven()
+			types := GetTypes()
+
+			Expect(types[0].BuildType).Should(BeEquivalentTo(maven.BuildToolType), "build tool type should be 'maven'")
+			Expect(types[0].File).Should(BeEquivalentTo("pom.xml"), "file type should be 'pom.xml'")
+
+			Expect(types[1].BuildType).Should(BeEquivalentTo(nodejs.BuildToolType), "build tool type should be 'maven'")
+			Expect(types[1].File).Should(BeEquivalentTo("package.json"), "file type should be 'pom.xml'")
+		})
+	})
 })

@@ -117,7 +117,7 @@ func handleError(ctx *app.ShowBuildToolDetectorContext, err error) error {
 }
 
 // formatResponse writes the header
-// and formats the response
+// and formats the response.
 func formatResponse(ctx *app.ShowBuildToolDetectorContext, httpTypeError *errs.HTTPTypeError) error {
 	ctx.WriteHeader(httpTypeError.StatusCode)
 	jsonHTTPTypeError, err := json.Marshal(httpTypeError)
