@@ -4,14 +4,14 @@ package main
 
 import (
 	"errors"
-	"flag"
-	"os"
+	"strconv"
 
 	"github.com/fabric8-services/fabric8-common/goamiddleware"
 	"github.com/fabric8-services/fabric8-common/token"
 	"github.com/goadesign/goa"
 	"github.com/goadesign/goa/middleware"
 	"github.com/goadesign/goa/middleware/security/jwt"
+	"github.com/spf13/viper"
 	"github.com/tinakurian/build-tool-detector/app"
 	"github.com/tinakurian/build-tool-detector/config"
 	"github.com/tinakurian/build-tool-detector/controllers"
@@ -29,34 +29,27 @@ const (
 	errorz            = "err"
 	buildToolDetector = "build-tool-detector"
 	port              = "PORT"
-	defaultPort       = "8099"
-)
-
-var (
-	portNumber     = flag.String(port, defaultPort, "port")
-	ghClientID     = flag.String(github.ClientID, "", "Github Client ID")
-	ghClientSecret = flag.String(github.ClientSecret, "", "Github Client Secret")
-	sentryDSN      = flag.String(log.SentryDSN, "", "Sentry DSN")
-	authURL        = flag.String(config.AuthURL, config.AuthURLDefault, "URL to Auth")
 )
 
 func main() {
 
-	flag.Parse()
+	viper.SetConfigName("config")
+	viper.AddConfigPath(".")
+	var configuration config.Configuration
 
-	if *ghClientID == "" || *ghClientSecret == "" {
-		log.Logger().
-			WithField(github.ClientID, ghClientID).
-			WithField(github.ClientSecret, ghClientSecret).
-			Fatalf(github.ErrFatalMissingGHAttributes.Error())
+	if err := viper.ReadInConfig(); err != nil {
+		log.Logger().Fatalf("Error reading config file, %s", err)
+	}
+	err := viper.Unmarshal(&configuration)
+	if err != nil {
+		log.Logger().Fatalf("unable to decode into struct, %v", err)
 	}
 
-	// Export Sentry DSN for logging
-	err := os.Setenv(log.BuildToolDetectorSentryDSN, *sentryDSN)
-	if err != nil {
+	if configuration.Github.ClientID == "" || configuration.Github.ClientSecret == "" {
 		log.Logger().
-			WithField(log.SentryDSN, sentryDSN).
-			Fatalf(errFatalFailedSettingSentryDSN.Error()+"%v", sentryDSN)
+			WithField(github.ClientID, configuration.Github.ClientID).
+			WithField(github.ClientSecret, configuration.Github.ClientSecret).
+			Fatalf(github.ErrFatalMissingGHAttributes.Error())
 	}
 
 	// Create service
@@ -68,7 +61,7 @@ func main() {
 	service.Use(middleware.ErrorHandler(service, true))
 	service.Use(middleware.Recover())
 
-	tokenManager, err := token.NewManager(&config.AuthConfig{AuthServiceURL: *authURL})
+	tokenManager, err := token.NewManager(&config.AuthConfiguration{URI: configuration.Auth.URI})
 	if err != nil {
 		log.Logger().Panic(nil, map[string]interface{}{
 			"err": err,
@@ -82,14 +75,14 @@ func main() {
 	app.UseJWTMiddleware(service, jwt.New(tokenManager.PublicKeys(), nil, app.NewJWTSecurity()))
 
 	// Mount "build-tool-detector" controller
-	c := controllers.NewBuildToolDetectorController(service, *ghClientID, *ghClientSecret)
+	c := controllers.NewBuildToolDetectorController(service)
 	app.MountBuildToolDetectorController(service, c)
 
 	cs := controllers.NewSwaggerController(service)
 	app.MountSwaggerController(service, cs)
 
 	// Start service
-	if err := service.ListenAndServe(":" + *portNumber); err != nil {
+	if err := service.ListenAndServe(":" + strconv.Itoa(configuration.Server.Port)); err != nil {
 		service.LogError(startup, errorz, err)
 	}
 }

@@ -40,19 +40,17 @@ const (
 // BuildToolDetectorController implements the build-tool-detector resource.
 type BuildToolDetectorController struct {
 	*goa.Controller
-	ghClientID     string
-	ghClientSecret string
 }
 
 // NewBuildToolDetectorController creates a build-tool-detector controller.
-func NewBuildToolDetectorController(service *goa.Service, ghClientID string, ghClientSecret string) *BuildToolDetectorController {
-	return &BuildToolDetectorController{Controller: service.NewController(buildToolDetectorController), ghClientID: ghClientID, ghClientSecret: ghClientSecret}
+func NewBuildToolDetectorController(service *goa.Service) *BuildToolDetectorController {
+	return &BuildToolDetectorController{Controller: service.NewController(buildToolDetectorController)}
 }
 
 // Show runs the show action.
 func (c *BuildToolDetectorController) Show(ctx *app.ShowBuildToolDetectorContext) error {
 	rawURL := ctx.URL
-	repositoryService, err := repository.CreateService(rawURL, ctx.Branch, c.ghClientID, c.ghClientSecret)
+	repositoryService, err := repository.CreateService(rawURL, ctx.Branch)
 	ctx.ResponseWriter.Header().Set(contentType, applicationJSON)
 	if err != nil {
 		return handleError(ctx, err)

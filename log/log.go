@@ -13,12 +13,10 @@ import (
 
 	"github.com/evalphobia/logrus_sentry"
 	"github.com/sirupsen/logrus"
+	"github.com/tinakurian/build-tool-detector/config"
 )
 
 const (
-	// BuildToolDetectorSentryDSN env var for sentry dsn
-	BuildToolDetectorSentryDSN = "BUILD_TOOL_DETECTOR_SENTRY_DSN"
-
 	// SentryDSN for sentry
 	SentryDSN = "SENTRY_DSN"
 )
@@ -30,15 +28,14 @@ const (
 
 // Logger something
 func Logger() *logrus.Entry {
-
+	var configuration config.Configuration
 	logrus.SetFormatter(&logrus.JSONFormatter{})
 	logrus.SetLevel(logrus.WarnLevel)
 
 	// TODO: have env variable to specify we are running tests which
 	// will return a different logger.
-	sentryDSN := os.Getenv(BuildToolDetectorSentryDSN)
-	if sentryDSN != "" {
-		hook, err := logrus_sentry.NewSentryHook(sentryDSN, []logrus.Level{
+	if configuration.Sentry.DSN != "" {
+		hook, err := logrus_sentry.NewSentryHook(configuration.Sentry.DSN, []logrus.Level{
 			logrus.PanicLevel,
 			logrus.FatalLevel,
 			logrus.ErrorLevel,

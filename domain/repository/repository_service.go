@@ -36,7 +36,7 @@ const (
 //
 // Note: This method will likely need to be enhanced
 // to handle different github url formats.
-func CreateService(urlToParse string, branch *string, ghClientID string, ghClientSecret string) (types.RepositoryService, error) {
+func CreateService(urlToParse string, branch *string) (types.RepositoryService, error) {
 
 	u, err := url.Parse(urlToParse)
 
@@ -55,5 +55,5 @@ func CreateService(urlToParse string, branch *string, ghClientID string, ghClien
 		return nil, github.ErrUnsupportedGithubURL
 	}
 
-	return github.Create(urlSegments, branch, ghClientID, ghClientSecret)
+	return github.Create(urlSegments, branch)
 }

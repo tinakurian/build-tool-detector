@@ -15,8 +15,8 @@ import (
 	"net/http"
 
 	"github.com/google/go-github/github"
+	"github.com/tinakurian/build-tool-detector/config"
 	"github.com/tinakurian/build-tool-detector/domain/types"
-	"github.com/tinakurian/build-tool-detector/log"
 )
 
 const (
@@ -68,8 +68,8 @@ type result struct {
 }
 
 // Create instantiate Github repository
-func Create(segment []string, branch *string, ghClientID string, ghClientSecret string) (types.RepositoryService, error) {
-	return newRepository(segment, branch, ghClientID, ghClientSecret)
+func Create(segment []string, branch *string) (types.RepositoryService, error) {
+	return newRepository(segment, branch)
 }
 
 // DetectBuildTool gets the contents for the service.
@@ -106,8 +106,8 @@ func (g githubRepository) Branch() string {
 // struct. The attributes struct will be used
 // to make a request to github to determine
 // the build tool type.
-func newRepository(segments []string, ctxBranch *string, ghClientID string, ghClientSecret string) (types.RepositoryService, error) {
-
+func newRepository(segments []string, ctxBranch *string) (types.RepositoryService, error) {
+	var configuration config.Configuration
 	var repositoryService types.RepositoryService
 
 	// Default branch that will be used if a branch
@@ -137,8 +137,8 @@ func newRepository(segments []string, ctxBranch *string, ghClientID string, ghCl
 		owner:        segments[1],
 		repository:   segments[2],
 		branch:       branch,
-		clientID:     ghClientID,
-		clientSecret: ghClientSecret,
+		clientID:     configuration.Github.ClientID,
+		clientSecret: configuration.Github.ClientSecret,
 	}
 
 	return repositoryService, nil
@@ -158,13 +158,6 @@ func getContents(ctx context.Context, repository githubRepository) result {
 	// If the github client id or github client
 	// secret are empty, we will log and fail.
 	client := github.NewClient(t.Client())
-
-	if t.ClientID == "" || t.ClientSecret == "" {
-		log.Logger().
-			WithField(ClientID, t.ClientID).
-			WithField(ClientSecret, t.ClientSecret).
-			Fatalf(ErrFatalMissingGHAttributes.Error())
-	}
 
 	_, err := getBranchRequest(ctx, client, repository)
 	if err != nil {
