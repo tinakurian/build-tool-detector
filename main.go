@@ -3,7 +3,6 @@
 package main
 
 import (
-	"errors"
 	"strconv"
 
 	"github.com/fabric8-services/fabric8-common/goamiddleware"
@@ -19,16 +18,10 @@ import (
 	"github.com/tinakurian/build-tool-detector/log"
 )
 
-var (
-	// errFatalFailedSettingSentryDSN failed to set sentry env var
-	errFatalFailedSettingSentryDSN = errors.New("failed to set environment variable for SENTRY_DSN: ")
-)
-
 const (
 	startup           = "startup"
 	errorz            = "err"
 	buildToolDetector = "build-tool-detector"
-	port              = "PORT"
 )
 
 func main() {
@@ -75,7 +68,7 @@ func main() {
 	app.UseJWTMiddleware(service, jwt.New(tokenManager.PublicKeys(), nil, app.NewJWTSecurity()))
 
 	// Mount "build-tool-detector" controller
-	c := controllers.NewBuildToolDetectorController(service)
+	c := controllers.NewBuildToolDetectorController(service, configuration)
 	app.MountBuildToolDetectorController(service, c)
 
 	cs := controllers.NewSwaggerController(service)

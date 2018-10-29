@@ -12,11 +12,10 @@ package github
 import (
 	"context"
 	"errors"
-	"net/http"
-
 	"github.com/google/go-github/github"
 	"github.com/tinakurian/build-tool-detector/config"
 	"github.com/tinakurian/build-tool-detector/domain/types"
+	"net/http"
 )
 
 const (
@@ -68,8 +67,8 @@ type result struct {
 }
 
 // Create instantiate Github repository
-func Create(segment []string, branch *string) (types.RepositoryService, error) {
-	return newRepository(segment, branch)
+func Create(segment []string, branch *string, configuration config.Configuration) (types.RepositoryService, error) {
+	return newRepository(segment, branch, configuration)
 }
 
 // DetectBuildTool gets the contents for the service.
@@ -106,8 +105,7 @@ func (g githubRepository) Branch() string {
 // struct. The attributes struct will be used
 // to make a request to github to determine
 // the build tool type.
-func newRepository(segments []string, ctxBranch *string) (types.RepositoryService, error) {
-	var configuration config.Configuration
+func newRepository(segments []string, ctxBranch *string, configuration config.Configuration) (types.RepositoryService, error) {
 	var repositoryService types.RepositoryService
 
 	// Default branch that will be used if a branch

@@ -52,4 +52,4 @@ public/
 bin/
 
 # setup
-environment.sh
+config.yml

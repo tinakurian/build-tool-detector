@@ -13,11 +13,11 @@ package repository
 
 import (
 	"errors"
-	"net/url"
-	"strings"
-
+	"github.com/tinakurian/build-tool-detector/config"
 	"github.com/tinakurian/build-tool-detector/domain/repository/github"
 	"github.com/tinakurian/build-tool-detector/domain/types"
+	"net/url"
+	"strings"
 )
 
 var (
@@ -36,7 +36,7 @@ const (
 //
 // Note: This method will likely need to be enhanced
 // to handle different github url formats.
-func CreateService(urlToParse string, branch *string) (types.RepositoryService, error) {
+func CreateService(urlToParse string, branch *string, configuration config.Configuration) (types.RepositoryService, error) {
 
 	u, err := url.Parse(urlToParse)
 
@@ -55,5 +55,5 @@ func CreateService(urlToParse string, branch *string) (types.RepositoryService, 
 		return nil, github.ErrUnsupportedGithubURL
 	}
 
-	return github.Create(urlSegments, branch)
+	return github.Create(urlSegments, branch, configuration)
 }

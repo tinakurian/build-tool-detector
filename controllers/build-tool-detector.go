@@ -12,9 +12,9 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-
 	"github.com/goadesign/goa"
 	"github.com/tinakurian/build-tool-detector/app"
+	"github.com/tinakurian/build-tool-detector/config"
 	errs "github.com/tinakurian/build-tool-detector/controllers/error"
 	"github.com/tinakurian/build-tool-detector/domain/repository"
 	"github.com/tinakurian/build-tool-detector/domain/repository/github"
@@ -40,17 +40,18 @@ const (
 // BuildToolDetectorController implements the build-tool-detector resource.
 type BuildToolDetectorController struct {
 	*goa.Controller
+	config.Configuration
 }
 
 // NewBuildToolDetectorController creates a build-tool-detector controller.
-func NewBuildToolDetectorController(service *goa.Service) *BuildToolDetectorController {
-	return &BuildToolDetectorController{Controller: service.NewController(buildToolDetectorController)}
+func NewBuildToolDetectorController(service *goa.Service, configuration config.Configuration) *BuildToolDetectorController {
+	return &BuildToolDetectorController{Controller: service.NewController(buildToolDetectorController), Configuration: configuration}
 }
 
 // Show runs the show action.
 func (c *BuildToolDetectorController) Show(ctx *app.ShowBuildToolDetectorContext) error {
 	rawURL := ctx.URL
-	repositoryService, err := repository.CreateService(rawURL, ctx.Branch)
+	repositoryService, err := repository.CreateService(rawURL, ctx.Branch, c.Configuration)
 	ctx.ResponseWriter.Header().Set(contentType, applicationJSON)
 	if err != nil {
 		return handleError(ctx, err)
