@@ -12,10 +12,11 @@ package github
 import (
 	"context"
 	"errors"
+	"net/http"
+
 	"github.com/google/go-github/github"
 	"github.com/tinakurian/build-tool-detector/config"
 	"github.com/tinakurian/build-tool-detector/domain/types"
-	"net/http"
 )
 
 const (

@@ -8,6 +8,8 @@ go-github api calls.
 package controllers_test
 
 import (
+	"io/ioutil"
+
 	"github.com/goadesign/goa"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -16,7 +18,6 @@ import (
 	"github.com/tinakurian/build-tool-detector/config"
 	controllers "github.com/tinakurian/build-tool-detector/controllers"
 	"gopkg.in/h2non/gock.v1"
-	"io/ioutil"
 )
 
 var _ = Describe("BuildToolDetector", func() {
